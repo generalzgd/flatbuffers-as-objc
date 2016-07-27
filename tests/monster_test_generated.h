@@ -222,7 +222,7 @@ inline flatbuffers::Offset<Stat> CreateStat(flatbuffers::FlatBufferBuilder &_fbb
   return CreateStat(_fbb, id ? 0 : _fbb.CreateString(id), val, count);
 }
 
-/// an example documentation comment: monster object
+	/// an example documentation comment: monster object
 struct Monster FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   enum {
     VT_POS = 4,
@@ -276,8 +276,8 @@ struct Monster FLATBUFFERS_FINAL_CLASS : private flatbuffers::Table {
   flatbuffers::Vector<const Test *> *mutable_test4() { return GetPointer<flatbuffers::Vector<const Test *> *>(VT_TEST4); }
   const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *testarrayofstring() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_TESTARRAYOFSTRING); }
   flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *mutable_testarrayofstring() { return GetPointer<flatbuffers::Vector<flatbuffers::Offset<flatbuffers::String>> *>(VT_TESTARRAYOFSTRING); }
-  /// an example documentation comment: this will end up in the generated code
-  /// multiline too
+	  /// an example documentation comment: this will end up in the generated code
+	  /// multiline too
   const flatbuffers::Vector<flatbuffers::Offset<Monster>> *testarrayoftables() const { return GetPointer<const flatbuffers::Vector<flatbuffers::Offset<Monster>> *>(VT_TESTARRAYOFTABLES); }
   flatbuffers::Vector<flatbuffers::Offset<Monster>> *mutable_testarrayoftables() { return GetPointer<flatbuffers::Vector<flatbuffers::Offset<Monster>> *>(VT_TESTARRAYOFTABLES); }
   const Monster *enemy() const { return GetPointer<const Monster *>(VT_ENEMY); }

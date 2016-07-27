@@ -22,7 +22,7 @@ namespace as3{
 	public:
 		As3Generator(const Parser &parser, const std::string &path, 
 					const std::string &file_name)
-			:BaseGenerator(parser, path, file_name, "\\", "\\"){
+			:BaseGenerator(parser, path, file_name, "", "."){
 			assert(1);
 		};
 
@@ -234,6 +234,10 @@ namespace as3{
 		void GetStructFieldOfTable(const FieldDef &field, std::string *code_ptr){
 			std::string &code = *code_ptr;
 
+			code += Indent + Indent + "/**\n";
+			code += Indent + Indent + " * @return " + MakeCamel(GenTypeGet(field.value.type)) + "\n";
+			code += Indent + Indent + " */\n";
+
 			code += Indent + Indent + "public function get"+MakeCamel(field.name) + "():"+MakeCamel(GenTypeGet(field.value.type))+"\n";
 			code += Indent + Indent + "{\n";
 			code += Indent + Indent + Indent + "var obj:"+MakeCamel(GenTypeGet(field.value.type))+" = new " + MakeCamel(GenTypeGet(field.value.type)) + "();\n";
@@ -245,12 +249,16 @@ namespace as3{
 				code += "this.__indirect(o + this.bb_pos), this.bb) : ";
 			}
 			code += GenDefaultValue(field.value) + ";\n";
-			code += Indent + Indent + Indent + "return obj\n";
+			code += Indent + Indent + Indent + "return obj;\n";
 			code += Indent + Indent + "}\n\n";
 		}
 
 		void GetStringField(const FieldDef &field, std::string *code_ptr){
 			std::string &code = *code_ptr;
+
+			code += Indent + Indent + "/**\n";
+			code += Indent + Indent + " * @return String\n";
+			code += Indent + Indent + " */\n";
 
 			code += Indent + Indent + "public function get"+MakeCamel(field.name)+"():String\n";
 			code += Indent + Indent + "{\n";
@@ -351,8 +359,9 @@ namespace as3{
 					StructBuilderArgs(*field.value.type.struct_def, (nameprefix + (field.name + "_")).c_str(), code_ptr);
 				}else{
 					std::string &code = *code_ptr;
-					code += (std::string)", " + nameprefix + ":" + GenTypeGet(field.value.type);
-					code += MakeCamel(field.name, false);
+					code += ", ";
+					code += "\n" + Indent + Indent + Indent + Indent + Indent + Indent + Indent + Indent + Indent + Indent;
+					code += nameprefix + MakeCamel(field.name, false) + ":" + GenTypeGet(field.value.type);
 				}
 			}
 		}
@@ -670,7 +679,7 @@ namespace as3{
 			case BASE_TYPE_VECTOR:
 				return GenGetter(type.VectorType());
 			default:
-				return "Get";
+				return "get";
 			}
 		}
 
@@ -706,7 +715,7 @@ namespace as3{
 		std::string GenDefaultValue(const Value &value){
 			if(value.type.enum_def){
 				if(auto val = value.type.enum_def->ReverseLookup(atoi(value.constant.c_str()), false)){
-					return WrapInNameSpace(*value.type.enum_def) + "::" + val->name;
+					return WrapInNameSpace(*value.type.enum_def) + "." + val->name;
 				}
 			}
 

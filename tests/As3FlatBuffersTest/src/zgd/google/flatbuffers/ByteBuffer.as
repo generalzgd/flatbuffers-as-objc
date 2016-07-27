@@ -175,7 +175,7 @@ package zgd.google.flatbuffers
 		 * @param offset
 		 * @param value
 		 */		
-		public function putSByte(offset:int, value:int):void
+		public function putSbyte(offset:int, value:int):void
 		{
 			ByteBuffer.validateValue(-128, 127, value, "sbyte");
 			
@@ -219,7 +219,7 @@ package zgd.google.flatbuffers
 			_buffer.writeShort(value);
 		}
 		
-		public function putUShort(offset:int, value:int):void
+		public function putUshort(offset:int, value:int):void
 		{
 			ByteBuffer.validateValue(0, 65535, value, "short");
 			
@@ -239,7 +239,7 @@ package zgd.google.flatbuffers
 			_buffer.writeInt(value);
 		}
 		
-		public function putUInt(offset:int, value:uint):void
+		public function putUint(offset:int, value:uint):void
 		{
 			ByteBuffer.validateValue(0, 4294967295, value, "uint");
 			
@@ -259,7 +259,7 @@ package zgd.google.flatbuffers
 			_buffer.writeDouble(value);
 		}
 		
-		public function putULong(offset:int, value:Number):void
+		public function putUlong(offset:int, value:Number):void
 		{
 			ByteBuffer.validateValue(0, 1<<64-1, value, "ulong");
 			
@@ -300,13 +300,19 @@ package zgd.google.flatbuffers
 			_buffer.writeMultiByte(value, "utf-8");
 		}
 		
-		public function getUByte(index:int):int
+		public function getUbyte(index:int):int
 		{
 			_buffer.position = index;
 			return _buffer.readUnsignedByte();
 		}
 		
 		public function getByte(index:int):int
+		{
+			_buffer.position = index;
+			return _buffer.readByte();
+		}
+		
+		public function getSbyte(index:int):int
 		{
 			_buffer.position = index;
 			return _buffer.readByte();
@@ -340,7 +346,7 @@ package zgd.google.flatbuffers
 			return _buffer.readShort();
 		}
 		
-		public function getUShort(index:int):int
+		public function getUshort(index:int):int
 		{
 			assertOffsetAndLength(index, 2);
 			_buffer.position = index;
@@ -354,7 +360,7 @@ package zgd.google.flatbuffers
 			return _buffer.readInt();
 		}
 		
-		public function getUInt(index:int):uint
+		public function getUint(index:int):uint
 		{
 			assertOffsetAndLength(index, 4);
 			_buffer.position = index;
@@ -368,7 +374,7 @@ package zgd.google.flatbuffers
 			return _buffer.readDouble();
 		}
 		
-		public function getULong(index:int):Number
+		public function getUlong(index:int):Number
 		{
 			assertOffsetAndLength(index, 8);
 			_buffer.position = index;

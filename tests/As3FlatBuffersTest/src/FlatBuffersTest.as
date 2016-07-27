@@ -19,7 +19,7 @@ package
 	{
 		public function FlatBuffersTest()
 		{
-			//writeTest();
+			writeTest();
 			
 			readTest();
 		}

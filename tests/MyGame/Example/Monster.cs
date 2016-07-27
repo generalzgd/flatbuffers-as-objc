@@ -6,7 +6,7 @@ namespace MyGame.Example
 using System;
 using FlatBuffers;
 
-/// an example documentation comment: monster object
+	/// an example documentation comment: monster object
 public sealed class Monster : Table {
   public static Monster GetRootAsMonster(ByteBuffer _bb) { return GetRootAsMonster(_bb, new Monster()); }
   public static Monster GetRootAsMonster(ByteBuffer _bb, Monster obj) { return (obj.__init(_bb.GetInt(_bb.Position) + _bb.Position, _bb)); }
@@ -35,8 +35,8 @@ public sealed class Monster : Table {
   public int Test4Length { get { int o = __offset(22); return o != 0 ? __vector_len(o) : 0; } }
   public string GetTestarrayofstring(int j) { int o = __offset(24); return o != 0 ? __string(__vector(o) + j * 4) : null; }
   public int TestarrayofstringLength { get { int o = __offset(24); return o != 0 ? __vector_len(o) : 0; } }
-  /// an example documentation comment: this will end up in the generated code
-  /// multiline too
+	  /// an example documentation comment: this will end up in the generated code
+	  /// multiline too
   public Monster GetTestarrayoftables(int j) { return GetTestarrayoftables(new Monster(), j); }
   public Monster GetTestarrayoftables(Monster obj, int j) { int o = __offset(26); return o != 0 ? obj.__init(__indirect(__vector(o) + j * 4), bb) : null; }
   public int TestarrayoftablesLength { get { int o = __offset(26); return o != 0 ? __vector_len(o) : 0; } }

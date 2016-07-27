@@ -683,9 +683,6 @@ FLATBUFFERS_FINAL_CLASS
   void PopBytes(size_t amount) { buf_.pop(amount); }
 
   template<typename T> void AssertScalarT() {
-	  auto tmp0 = std::is_scalar<T>::value;
-	  int tmp1 = sizeof(T);
-	  int tmp2 = sizeof(Offset<void>);
     // The code assumes power of 2 sizes and endian-swap-ability.
     static_assert(std::is_scalar<T>::value
         // The Offset<T> type is essentially a scalar but fails is_scalar.

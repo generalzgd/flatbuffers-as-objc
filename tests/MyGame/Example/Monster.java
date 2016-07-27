@@ -9,7 +9,7 @@ import com.google.flatbuffers.*;
 
 @SuppressWarnings("unused")
 /**
- * an example documentation comment: monster object
+	 * an example documentation comment: monster object
  */
 public final class Monster extends Table {
   public static Monster getRootAsMonster(ByteBuffer _bb) { return getRootAsMonster(_bb, new Monster()); }
@@ -40,8 +40,8 @@ public final class Monster extends Table {
   public String testarrayofstring(int j) { int o = __offset(24); return o != 0 ? __string(__vector(o) + j * 4) : null; }
   public int testarrayofstringLength() { int o = __offset(24); return o != 0 ? __vector_len(o) : 0; }
   /**
-   * an example documentation comment: this will end up in the generated code
-   * multiline too
+	   * an example documentation comment: this will end up in the generated code
+	   * multiline too
    */
   public Monster testarrayoftables(int j) { return testarrayoftables(new Monster(), j); }
   public Monster testarrayoftables(Monster obj, int j) { int o = __offset(26); return o != 0 ? obj.__init(__indirect(__vector(o) + j * 4), bb) : null; }
