@@ -6,10 +6,7 @@
 *.class
 *.a
 *~
-*.vcxproj
 *.vcxproj.filters
-*.vcxproj.user
-*.sln
 *.suo
 *.keystore
 **/bin/**
@@ -65,3 +62,4 @@ build/VS2010/ipch/**/*.ipch
 /build_ide/VS2010/Debug
 /build_ide/VS2010/*
 /tests/As3FlatBuffersTest/bin-debug
+/build_ide/VS2010/FlatBuffers.sdf
