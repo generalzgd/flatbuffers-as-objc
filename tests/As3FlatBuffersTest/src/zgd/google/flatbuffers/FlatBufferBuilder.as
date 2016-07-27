@@ -858,7 +858,7 @@ package zgd.google.flatbuffers
 		
 		/**
 		 * A utility function to copy and return the ByteBuffer data from `start` to
-		 * `start` + `length` as a `byte[]`.
+		 * `start` + `length` as a `ByteArray`.
 		 *
 		 * @param start Start copying at this offset.
 		 * @param length How many bytes to copy.
