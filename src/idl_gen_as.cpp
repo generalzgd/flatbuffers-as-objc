@@ -72,7 +72,7 @@ namespace as3{
 			code += "package " + name_space_name + "\n{\n\n";
 
 			if(needs_imports){
-				code += Indent + "import google.flatbuffers.*;\n";
+				code += Indent + "import zgd.google.flatbuffers.*;\n";
 				code += Indent + "import flash.utils.ByteArray;\n";
 				code += "\n\n";
 			}

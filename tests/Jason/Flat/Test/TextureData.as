@@ -9,7 +9,7 @@
 package Jason.Flat.Test
 {
 
-	import google.flatbuffers.*;
+	import zgd.google.flatbuffers.*;
 	import flash.utils.ByteArray;
 
 
