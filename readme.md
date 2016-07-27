@@ -21,7 +21,7 @@ unpacking/parsing it first, while still having great forwards/backwards compatib
 * JavaScript
 * PHP
 * Python
-* ActionScript3
+* ActionScript3 (added)
 
 *and many more in progress...*
 
