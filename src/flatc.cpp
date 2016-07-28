@@ -82,12 +82,12 @@ const Generator generators[] = {
     "Generate Python files for tables/structs",
     flatbuffers::GeneralMakeRule },
 
-  { flatbuffers::GeneratePhp, nullptr, "--php", "PHP",
+  { flatbuffers::GeneratePhp, "-php", "--php", "PHP",
     flatbuffers::IDLOptions::kMAX,
     "Generate PHP files for tables/structs",
     flatbuffers::GeneralMakeRule },
 
-  {	flatbuffers::GenerateAS3, nullptr, "--as", "AS3",
+  {	flatbuffers::GenerateAS3, "-a", "--as", "AS3",
 	flatbuffers::IDLOptions::kMAX, 
 	"Generate ActionScript code for tables/structs",
 	flatbuffers::GeneralMakeRule },

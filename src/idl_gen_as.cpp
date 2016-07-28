@@ -119,7 +119,7 @@ namespace as3{
 
 		static void EnumMember(const EnumVal ev, std::string *code_ptr){
 			std::string &code = *code_ptr;
-			code += Indent + Indent + "public static const " + ev.name + " = " + NumToString(ev.value) + ";\n";
+			code += Indent + Indent + "public static const " + ev.name + ":int = " + NumToString(ev.value) + ";\n";
 		}
 
 		static void EndEnum(std::string *code_ptr){
