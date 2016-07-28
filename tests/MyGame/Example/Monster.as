@@ -55,12 +55,15 @@ package MyGame.Example
 			return this;
 		}
 
+		/**
+		 * @return Vec3
+		 */
 		public function getPos():Vec3
 		{
 			var obj:Vec3 = new Vec3();
 			var o:int = this.__offset(4);
 			o!=0?obj.init(o + this.bb_pos, this.bb) : 0;
-			return obj
+			return obj;
 		}
 
 		/**
@@ -81,6 +84,9 @@ package MyGame.Example
 			return o!=0?this.bb.getShort(o+this.bb_pos):100;
 		}
 
+		/**
+		 * @return String
+		 */
 		public function getName():String
 		{
 			var o:int = this.__offset(10);
@@ -200,12 +206,15 @@ package MyGame.Example
 			return o!=0?this.__vector_len(o):0;
 		}
 
+		/**
+		 * @return Monster
+		 */
 		public function getEnemy():Monster
 		{
 			var obj:Monster = new Monster();
 			var o:int = this.__offset(28);
 			o!=0?obj.init(this.__indirect(o + this.bb_pos), this.bb) : 0;
-			return obj
+			return obj;
 		}
 
 		/**
@@ -235,12 +244,15 @@ package MyGame.Example
 			return this.__vector_as_bytes(30);
 		}
 
+		/**
+		 * @return Stat
+		 */
 		public function getTestempty():Stat
 		{
 			var obj:Stat = new Stat();
 			var o:int = this.__offset(32);
 			o!=0?obj.init(this.__indirect(o + this.bb_pos), this.bb) : 0;
-			return obj
+			return obj;
 		}
 
 		/**

@@ -54,6 +54,9 @@ package MyGame.Example
 			return this;
 		}
 
+		/**
+		 * @return String
+		 */
 		public function getId():String
 		{
 			var o:int = this.__offset(4);
