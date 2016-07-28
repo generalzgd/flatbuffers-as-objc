@@ -15,11 +15,11 @@ package MyGame.Example
 		public static const Green = 2;
 		public static const Blue = 8;
 
-		private static const names:Array = ["Red", "Green", "Blue", ];
+		private static const names:Object = {1:"Red", 2:"Green", 8:"Blue", };
 
 		public static function Name(e:int):String
 		{
-			if(!names[e]){
+			if(!names.hasOwnProperty(e)){
 				throw new Error('Out of Enum Index!');
 			return names[e];
 		}

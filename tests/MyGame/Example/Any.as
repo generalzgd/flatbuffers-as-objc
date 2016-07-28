@@ -16,11 +16,11 @@ package MyGame.Example
 		public static const TestSimpleTableWithEnum = 2;
 		public static const MyGame_Example2_Monster = 3;
 
-		private static const names:Array = ["NONE", "Monster", "TestSimpleTableWithEnum", "MyGame_Example2_Monster", ];
+		private static const names:Object = {0:"NONE", 1:"Monster", 2:"TestSimpleTableWithEnum", 3:"MyGame_Example2_Monster", };
 
 		public static function Name(e:int):String
 		{
-			if(!names[e]){
+			if(!names.hasOwnProperty(e)){
 				throw new Error('Out of Enum Index!');
 			return names[e];
 		}

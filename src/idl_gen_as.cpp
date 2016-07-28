@@ -1,6 +1,8 @@
-/*
-
-*/
+/**
+ * 
+ * Powered by Zhangguodong 
+ * 
+ */
 
 // independent from idl_parser, since this code is not needed for most clients
 
@@ -651,16 +653,16 @@ namespace as3{
 
 			std::string &code = *code_ptr;
 			code += "\n";
-			code += Indent + Indent + "private static const names:Array = [";
+			code += Indent + Indent + "private static const names:Object = {";
 			for(auto it = enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
 				auto &ev = **it;
-				code += "\""+ev.name+"\", ";
+				code += NumToString(ev.value) + ":\""+ev.name+"\", ";
 			}
-			code += "];\n\n";
+			code += "};\n\n";
 
 			code += Indent + Indent + "public static function Name(e:int):String\n";
 			code += Indent + Indent + "{\n";
-			code += Indent + Indent + Indent + "if(!names[e]){\n";
+			code += Indent + Indent + Indent + "if(!names.hasOwnProperty(e)){\n";
 			code += Indent + Indent + Indent + Indent + "throw new Error('Out of Enum Index!');\n";
 			code += Indent + Indent + Indent + "return names[e];\n";
 			code += Indent + Indent + "}\n";

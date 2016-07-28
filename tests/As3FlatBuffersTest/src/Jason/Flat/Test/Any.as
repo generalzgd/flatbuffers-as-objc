@@ -15,11 +15,11 @@ package Jason.Flat.Test
 		public static const TextureData = 1;
 		public static const Texture = 2;
 
-		private static const names:Array = ["NONE", "TextureData", "Texture", ];
+		private static const names:Object = ["NONE", "TextureData", "Texture", ];
 
 		public static function Name(e:int):String
 		{
-			if(!names[e]){
+			if(!names.hasOwnProperty(e)){
 				throw new Error('Out of Enum Index!');
 			return names[e];
 		}
