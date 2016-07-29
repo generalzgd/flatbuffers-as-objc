@@ -11,9 +11,9 @@ package MyGame.Example
 
 	public class Color
 	{
-		public static const Red = 1;
-		public static const Green = 2;
-		public static const Blue = 8;
+		public static const Red:int = 1;
+		public static const Green:int = 2;
+		public static const Blue:int = 8;
 
 		private static const names:Object = {1:"Red", 2:"Green", 8:"Blue", };
 

@@ -11,10 +11,10 @@ package MyGame.Example
 
 	public class Any
 	{
-		public static const NONE = 0;
-		public static const Monster = 1;
-		public static const TestSimpleTableWithEnum = 2;
-		public static const MyGame_Example2_Monster = 3;
+		public static const NONE:int = 0;
+		public static const Monster:int = 1;
+		public static const TestSimpleTableWithEnum:int = 2;
+		public static const MyGame_Example2_Monster:int = 3;
 
 		private static const names:Object = {0:"NONE", 1:"Monster", 2:"TestSimpleTableWithEnum", 3:"MyGame_Example2_Monster", };
 

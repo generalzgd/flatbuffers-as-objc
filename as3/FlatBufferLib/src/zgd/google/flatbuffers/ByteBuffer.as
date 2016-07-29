@@ -175,9 +175,23 @@ package zgd.google.flatbuffers
 		 * @param offset
 		 * @param value
 		 */		
-		public function putSByte(offset:int, value:int):void
+		public function putSbyte(offset:int, value:int):void
 		{
 			ByteBuffer.validateValue(-128, 127, value, "sbyte");
+			
+			assertOffsetAndLength(offset, 1);
+			
+			_buffer[offset] = value;
+		}
+		
+		/**
+		 * -128~127
+		 * @param offset
+		 * @param value
+		 */		
+		public function putByte(offset:int, value:int):void
+		{
+			ByteBuffer.validateValue(-128, 127, value, "ubyte");
 			
 			assertOffsetAndLength(offset, 1);
 			
@@ -189,7 +203,7 @@ package zgd.google.flatbuffers
 		 * @param offset
 		 * @param value
 		 */		
-		public function putByte(offset:int, value:int):void
+		public function putUbyte(offset:int, value:int):void
 		{
 			ByteBuffer.validateValue(0, 255, value, "ubyte");
 			
@@ -220,18 +234,31 @@ package zgd.google.flatbuffers
 		}
 		
 		/**
-		 * 估计会越界，所以要使用putShort
+		 * 
 		 * @param offset
 		 * @param value
 		 */		
-		public function putUShort(offset:int, value:int):void
+		public function putUshort(offset:int, value:int):void
 		{
 			ByteBuffer.validateValue(0, 65535, value, "short");
 			
 			assertOffsetAndLength(offset, 2);
 			
 			_buffer.position = offset;
-			_buffer.writeShort(value);
+			//_buffer.writeShort(value);
+			
+			var l:int = value&0xFF;
+			var h:int = (value&0xFF00)>>8;
+			if(_is_little_endian)
+			{
+				_buffer[offset] = l;
+				_buffer[offset+1] = h;
+			}
+			else
+			{
+				_buffer[offset] = h;
+				_buffer[offset+1] = l;
+			}
 		}
 		
 		public function putInt(offset:int, value:int):void
@@ -244,7 +271,7 @@ package zgd.google.flatbuffers
 			_buffer.writeInt(value);
 		}
 		
-		public function putUInt(offset:int, value:uint):void
+		public function putUint(offset:int, value:uint):void
 		{
 			ByteBuffer.validateValue(0, 4294967295, value, "uint");
 			
@@ -264,7 +291,7 @@ package zgd.google.flatbuffers
 			_buffer.writeDouble(value);
 		}
 		
-		public function putULong(offset:int, value:Number):void
+		public function putUlong(offset:int, value:Number):void
 		{
 			ByteBuffer.validateValue(0, 1<<64-1, value, "ulong");
 			
@@ -305,13 +332,19 @@ package zgd.google.flatbuffers
 			_buffer.writeMultiByte(value, "utf-8");
 		}
 		
-		public function getUByte(index:int):int
+		public function getUbyte(index:int):int
 		{
 			_buffer.position = index;
 			return _buffer.readUnsignedByte();
 		}
 		
 		public function getByte(index:int):int
+		{
+			_buffer.position = index;
+			return _buffer.readByte();
+		}
+		
+		public function getSbyte(index:int):int
 		{
 			_buffer.position = index;
 			return _buffer.readByte();
@@ -345,7 +378,7 @@ package zgd.google.flatbuffers
 			return _buffer.readShort();
 		}
 		
-		public function getUShort(index:int):int
+		public function getUshort(index:int):int
 		{
 			assertOffsetAndLength(index, 2);
 			_buffer.position = index;
@@ -359,7 +392,7 @@ package zgd.google.flatbuffers
 			return _buffer.readInt();
 		}
 		
-		public function getUInt(index:int):uint
+		public function getUint(index:int):uint
 		{
 			assertOffsetAndLength(index, 4);
 			_buffer.position = index;
@@ -373,7 +406,7 @@ package zgd.google.flatbuffers
 			return _buffer.readDouble();
 		}
 		
-		public function getULong(index:int):Number
+		public function getUlong(index:int):Number
 		{
 			assertOffsetAndLength(index, 8);
 			_buffer.position = index;

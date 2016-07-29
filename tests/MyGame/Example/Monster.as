@@ -100,7 +100,7 @@ package MyGame.Example
 		public function getInventory(j:int):*
 		{
 			var o:int = this.__offset(14);
-			return o!=0?this.bb.getByte(this.__vector(o) + j * 1):0;
+			return o!=0?this.bb.getUbyte(this.__vector(o) + j * 1):0;
 		}
 
 		/**
@@ -126,7 +126,7 @@ package MyGame.Example
 		public function getColor():int
 		{
 			var o:int = this.__offset(16);
-			return o!=0?this.bb.getSbyte(o+this.bb_pos):MyGame.Example.Color.Blue;
+			return o!=0?this.bb.getByte(o+this.bb_pos):MyGame.Example.Color.Blue;
 		}
 
 		/**
@@ -224,7 +224,7 @@ package MyGame.Example
 		public function getTestnestedflatbuffer(j:int):*
 		{
 			var o:int = this.__offset(30);
-			return o!=0?this.bb.getByte(this.__vector(o) + j * 1):0;
+			return o!=0?this.bb.getUbyte(this.__vector(o) + j * 1):0;
 		}
 
 		/**
@@ -538,7 +538,7 @@ package MyGame.Example
 		{
 			builder.startVector(1, data.length, 1);
 			for(var i:int=data.length-1; i>=0; i--){
-				builder.addByte(data[i]);
+				builder.addUbyte(data[i]);
 			}
 			return builder.endVector();
 		}
@@ -560,7 +560,7 @@ package MyGame.Example
 		 */
 		public static function addColor(builder:FlatBufferBuilder, color:int):void
 		{
-			builder.addSbyteX(6, color, 8);
+			builder.addByteX(6, color, 8);
 		}
 
 		/**
@@ -709,7 +709,7 @@ package MyGame.Example
 		{
 			builder.startVector(1, data.length, 1);
 			for(var i:int=data.length-1; i>=0; i--){
-				builder.addByte(data[i]);
+				builder.addUbyte(data[i]);
 			}
 			return builder.endVector();
 		}

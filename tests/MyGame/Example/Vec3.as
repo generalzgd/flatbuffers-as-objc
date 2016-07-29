@@ -64,7 +64,7 @@ package MyGame.Example
 		 */
 		public function getTest2():int
 		{
-			return this.bb.getSbyte(this.bb_pos + 24);
+			return this.bb.getByte(this.bb_pos + 24);
 		}
 
 		/**
@@ -94,10 +94,10 @@ package MyGame.Example
 			builder.pad(2);
 			builder.prep(2, 4);
 			builder.pad(1);
-			builder.putSbyte(test3_b);
+			builder.putByte(test3_b);
 			builder.putShort(test3_a);
 			builder.pad(1);
-			builder.putSbyte(test2);
+			builder.putByte(test2);
 			builder.putDouble(test1);
 			builder.pad(4);
 			builder.putFloat(z);

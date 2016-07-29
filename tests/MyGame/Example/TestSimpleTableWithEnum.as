@@ -60,7 +60,7 @@ package MyGame.Example
 		public function getColor():int
 		{
 			var o:int = this.__offset(4);
-			return o!=0?this.bb.getSbyte(o+this.bb_pos):MyGame.Example.Color.Green;
+			return o!=0?this.bb.getByte(o+this.bb_pos):MyGame.Example.Color.Green;
 		}
 
 		/**
@@ -93,7 +93,7 @@ package MyGame.Example
 		 */
 		public static function addColor(builder:FlatBufferBuilder, color:int):void
 		{
-			builder.addSbyteX(0, color, 2);
+			builder.addByteX(0, color, 2);
 		}
 
 		/**

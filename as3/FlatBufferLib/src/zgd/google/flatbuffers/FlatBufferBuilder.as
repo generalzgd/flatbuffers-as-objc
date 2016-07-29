@@ -150,14 +150,19 @@ package zgd.google.flatbuffers
 			bb.putBool(space -= Constants.SIZEOF_BYTE, x);
 		}
 		
+		public function putSbyte(x:int):void
+		{
+			bb.putSbyte(space-=Constants.SIZEOF_BYTE, x);
+		}
+		
 		public function putByte(x:int):void
 		{
 			bb.putByte(space-=Constants.SIZEOF_BYTE, x);
 		}
 		
-		public function putSbyte(x:int):void
+		public function putUbyte(x:int):void
 		{
-			bb.putSByte(space-=Constants.SIZEOF_BYTE, x);
+			bb.putUbyte(space-=Constants.SIZEOF_BYTE, x);
 		}
 		
 		public function putShort(x:int):void
@@ -167,7 +172,7 @@ package zgd.google.flatbuffers
 		
 		public function putUshort(x:int):void
 		{
-			bb.putUShort(space-=Constants.SIZEOF_SHORT, x);
+			bb.putUshort(space-=Constants.SIZEOF_SHORT, x);
 		}
 		
 		public function putInt(x:int):void
@@ -177,7 +182,7 @@ package zgd.google.flatbuffers
 		
 		public function putUint(x:uint):void
 		{
-			bb.putUInt(space-=Constants.SIZEOF_INT, x);
+			bb.putUint(space-=Constants.SIZEOF_INT, x);
 		}
 		
 		public function putLong(x:Number):void
@@ -187,7 +192,7 @@ package zgd.google.flatbuffers
 		
 		public function putUlong(x:Number):void
 		{
-			bb.putULong(space-=Constants.SIZEOF_LONG, x);
+			bb.putUlong(space-=Constants.SIZEOF_LONG, x);
 		}
 		
 		public function putFloat(x:Number):void

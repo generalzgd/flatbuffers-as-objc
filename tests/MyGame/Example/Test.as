@@ -40,7 +40,7 @@ package MyGame.Example
 		 */
 		public function getB():int
 		{
-			return this.bb.getSbyte(this.bb_pos + 2);
+			return this.bb.getByte(this.bb_pos + 2);
 		}
 
 
@@ -53,7 +53,7 @@ package MyGame.Example
 		{
 			builder.prep(2, 4);
 			builder.pad(1);
-			builder.putSbyte(b);
+			builder.putByte(b);
 			builder.putShort(a);
 			return builder.offset();
 	}

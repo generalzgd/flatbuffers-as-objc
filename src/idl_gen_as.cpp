@@ -709,7 +709,7 @@ namespace as3{
 				FLATBUFFERS_GEN_TYPES(FLATBUFFERS_TD)
 #undef FLATBUFFERS_TD
 			};*/
-			static const char * ctypename[] = {"byte","byte","bool","sbyte","byte","short","ushort","int","uint","long","ulong","float","double","StringOffset","VectorOffset","int","int"};
+			static const char * ctypename[] = {"byte","byte","bool","byte","ubyte","short","ushort","int","uint","long","ulong","float","double","StringOffset","VectorOffset","int","int"};
 			std::string typeStr = ctypename[type.base_type];
 			return typeStr;
 		}
