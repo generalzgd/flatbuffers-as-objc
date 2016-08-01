@@ -668,6 +668,44 @@ void GenStructBody(const StructDef &struct_def, std::string *code_ptr, const cha
   }
 }
 
+void GenFactoryFun(std::string *code_ptr){
+	std::string &code = *code_ptr;
+
+	std::string Indent = " ";
+
+	bool finded = false;
+	for(auto it=parser_.enums_.vec.begin(); it!=parser_.enums_.vec.end(); it++){
+		auto &enum_def = **it;
+		if(enum_def.name == "ProtocolID"){
+			finded = true;
+			break;
+		}
+	}
+	if(!finded)return;
+			
+	code += Indent + "/**\n";
+	code += Indent + " * get struct class by enum protocol id\n";
+	code += Indent + " */\n";
+	code += Indent + "public static Object function getProtocol(uint protocolID)\n";
+	code += Indent + "{\n";
+	code += Indent + Indent + "switch(protocolID)\n";
+	code += Indent + Indent + "{\n";
+	for(auto it=parser_.enums_.vec.begin(); it!=parser_.enums_.vec.end(); ++it){
+		auto &enum_def = **it;
+		if(enum_def.name == "ProtocolID"){
+			for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
+				auto &ev = **it;
+				code += Indent + Indent + Indent + "case " + NumToString(ev.value) +":\n";
+				code += Indent + Indent + Indent + Indent + "return new " + FullNamespace(".", *enum_def.defined_namespace)+"."+MakeCamel(ev.name)+"();break;\n";
+			}
+			break;
+		}
+	}
+	code += Indent + Indent + "}\n";
+	code += Indent + Indent + "return null;\n";
+	code += Indent + "}\n\n";
+}
+
 void GenStruct(StructDef &struct_def, std::string *code_ptr) {
   if (struct_def.generated) return;
   std::string &code = *code_ptr;
@@ -691,6 +729,13 @@ void GenStruct(StructDef &struct_def, std::string *code_ptr) {
   code += "class " + struct_def.name + lang_.inheritance_marker;
   code += struct_def.fixed ? "Struct" : "Table";
   code += " {\n";
+
+  if(&struct_def == parser_.root_struct_def_ && parser_.opts.generate_reflector){
+	GenFactoryFun(code_ptr);
+	code += "}\n";
+	return;
+  }
+
   if (!struct_def.fixed) {
     // Generate a special accessor for the table that when used as the root
     // of a FlatBuffer

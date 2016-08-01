@@ -756,6 +756,42 @@ namespace php {
       GetEndOffsetOnTable(struct_def, code_ptr);
     }
 
+	void GenFactoryFun(std::string *code_ptr){
+		std::string &code = *code_ptr;
+
+		bool finded = false;
+		for(auto it=parser_.enums_.vec.begin(); it!=parser_.enums_.vec.end(); it++){
+			auto &enum_def = **it;
+			if(enum_def.name == "ProtocolID"){
+				finded = true;
+				break;
+			}
+		}
+		if(!finded)return;
+			
+		code += Indent + Indent + "/**\n";
+		code += Indent + Indent + " * get struct class by enum protocol id\n";
+		code += Indent + Indent + " */\n";
+		code += Indent + Indent + "public static function getProtocol(protocolID)\n";
+		code += Indent + Indent + "{\n";
+		code += Indent + Indent + Indent + "switch(protocolID)\n";
+		code += Indent + Indent + Indent + "{\n";
+		for(auto it=parser_.enums_.vec.begin(); it!=parser_.enums_.vec.end(); ++it){
+			auto &enum_def = **it;
+			if(enum_def.name == "ProtocolID"){
+				for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
+					auto &ev = **it;
+					code += Indent + Indent + Indent + Indent + "case " + NumToString(ev.value) +":\n";
+					code += Indent + Indent + Indent + Indent + Indent + "return new " + FullNamespace(".", *enum_def.defined_namespace)+"."+MakeCamel(ev.name)+"();break;\n";
+				}
+				break;
+			}
+		}
+		code += Indent + Indent + Indent + "}\n";
+		code += Indent + Indent + Indent + "return null;\n";
+		code += Indent + Indent + "}\n\n";
+	}
+
     // Generate struct or table methods.
     void GenStruct(const StructDef &struct_def,
       std::string *code_ptr) {
@@ -763,6 +799,11 @@ namespace php {
 
       GenComment(struct_def.doc_comment, code_ptr, nullptr);
       BeginClass(struct_def, code_ptr);
+
+	  if(&struct_def == parser_.root_struct_def_ && parser_.opts.generate_reflector){
+		  GenFactoryFun(code_ptr);
+		  return;
+	  }
 
       if (!struct_def.fixed) {
         // Generate a special accessor for the table that has been declared as

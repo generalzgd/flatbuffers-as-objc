@@ -55,12 +55,12 @@ namespace as3{
 				auto &struct_def = **it;
 				std::string declcode;
 				GenStruct(struct_def, &declcode);
-				if(!SaveType(struct_def, declcode, true, &struct_def == parser_.root_struct_def_))return false;
+				if(!SaveType(struct_def, declcode, true))return false;
 			}
 			return true;
 		}
 
-		void BeginFile(const std::string name_space_name, const bool needs_imports, std::string *code_ptr, bool bRoot=false){
+		void BeginFile(const std::string name_space_name, const bool needs_imports, std::string *code_ptr){
 			std::string &code = *code_ptr;
 			code += "/**\n";
 			code += " * \n";
@@ -87,12 +87,12 @@ namespace as3{
 			}
 		}
 
-		bool SaveType(const Definition &def, const std::string &classcode, bool needs_imports, bool bRoot=false){
+		bool SaveType(const Definition &def, const std::string &classcode, bool needs_imports){
 			if(!classcode.length())
 				return true;
 
 			std::string code = "";
-			BeginFile(FullNamespace(".", *def.defined_namespace), needs_imports, &code, bRoot);
+			BeginFile(FullNamespace(".", *def.defined_namespace), needs_imports, &code);
 
 			code += classcode;
 
@@ -725,15 +725,13 @@ namespace as3{
 					for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
 						auto &ev = **it;
 						code += Indent + Indent + Indent + Indent + "case " + NumToString(ev.value) +":\n";
-						code += Indent + Indent + Indent + Indent + "{\n";
-						code += Indent + Indent + Indent + Indent + Indent + "return new " + FullNamespace(".", *enum_def.defined_namespace)+"."+MakeCamel(ev.name)+"()\n";
-						code += Indent + Indent + Indent + Indent + Indent + "break;\n";
-						code += Indent + Indent + Indent + Indent + "}\n";
+						code += Indent + Indent + Indent + Indent + Indent + "return new " + FullNamespace(".", *enum_def.defined_namespace)+"."+MakeCamel(ev.name)+"();break;\n";
 					}
 					break;
 				}
 			}
 			code += Indent + Indent + Indent + "}\n";
+			code += Indent + Indent + Indent + "return null;\n";
 			code += Indent + Indent + "}\n\n";
 		}
 
