@@ -55,12 +55,12 @@ namespace as3{
 				auto &struct_def = **it;
 				std::string declcode;
 				GenStruct(struct_def, &declcode);
-				if(!SaveType(struct_def, declcode, true))return false;
+				if(!SaveType(struct_def, declcode, true, &struct_def == parser_.root_struct_def_))return false;
 			}
 			return true;
 		}
 
-		void BeginFile(const std::string name_space_name, const bool needs_imports, std::string *code_ptr){
+		void BeginFile(const std::string name_space_name, const bool needs_imports, std::string *code_ptr, bool bRoot=false){
 			std::string &code = *code_ptr;
 			code += "/**\n";
 			code += " * \n";
@@ -76,16 +76,23 @@ namespace as3{
 			if(needs_imports){
 				code += Indent + "import zgd.google.flatbuffers.*;\n";
 				code += Indent + "import flash.utils.ByteArray;\n";
+				
+				/*if(bRoot && parser_.opts.generate_reflector){
+					code += Indent + "import flash.utils.Dictionary;\n";
+					code += Indent + "import flash.utils.describeType;\n";
+					code += Indent + "import flash.utils.getDefinitionByName;\n";
+				}*/
+				
 				code += "\n\n";
 			}
 		}
 
-		bool SaveType(const Definition &def, const std::string &classcode, bool needs_imports){
+		bool SaveType(const Definition &def, const std::string &classcode, bool needs_imports, bool bRoot=false){
 			if(!classcode.length())
 				return true;
 
 			std::string code = "";
-			BeginFile(FullNamespace(".", *def.defined_namespace), needs_imports, &code);
+			BeginFile(FullNamespace(".", *def.defined_namespace), needs_imports, &code, bRoot);
 
 			code += classcode;
 
@@ -566,6 +573,68 @@ namespace as3{
 			}
 		}
 
+		void GenJsonBuilder(const StructDef &struct_def, std::string *code_ptr){
+			std::string &code = *code_ptr;
+			code += Indent + Indent + "/**\n";
+			code += Indent + Indent + " * change to json object\n";
+			code += Indent + Indent + " */\n";
+			code += Indent + Indent + "public function toJson():Object\n";
+			code += Indent + Indent + "{\n";
+			code += Indent + Indent + Indent + "var o:Object = {};\n";
+			
+			for(auto it = struct_def.fields.vec.begin(); it!=struct_def.fields.vec.end(); ++it){
+				auto &tmpfield = **it;
+				if(tmpfield.value.type.base_type == BASE_TYPE_VECTOR){
+					code += Indent + Indent + Indent + "var arr:Array;\n";
+					code += Indent + Indent + Indent + "var len:int;\n";
+					code += Indent + Indent + Indent + "var i:int;\n";
+					break;
+				}
+			}
+
+			for(auto it = struct_def.fields.vec.begin(); it!=struct_def.fields.vec.end(); ++it){
+				auto &field = **it;
+				if(!field.deprecated){
+
+					if(IsScalar(field.value.type.base_type)){
+						code += Indent + Indent + Indent + "o." + field.name + " = get" + MakeCamel(field.name) + "();\n";
+					}else if(field.value.type.base_type == BASE_TYPE_STRING){
+						code += Indent + Indent + Indent + "o." + field.name + " = get" + MakeCamel(field.name) + "();\n";
+					}else if(field.value.type.base_type == BASE_TYPE_VECTOR){
+						GenVectorJson(struct_def, field, code_ptr);
+					}else{
+						code += Indent + Indent + Indent + "o." + field.name + " = get" + MakeCamel(field.name) + "().toJson();\n";
+					}
+				}else{
+					code += Indent + Indent + Indent + "o." + field.name + " = " + (field.value.type.base_type==BASE_TYPE_BOOL?"false":field.value.constant)+";\n";
+				}
+			}
+
+			code += Indent + Indent + Indent + "return o;\n";
+			code += Indent + Indent + "}\n\n";
+
+		}
+
+		void GenVectorJson(const StructDef &struct_def, const FieldDef &field, std::string* code_ptr){
+			std::string &code = *code_ptr;
+
+			auto vector_type = field.value.type.VectorType();
+			
+			code += Indent + Indent + Indent + "arr = [];\n";
+			code += Indent + Indent + Indent + "len = get"+MakeCamel(field.name)+"Length();\n";
+			code += Indent + Indent + Indent + "for(i=0; i<len; ++i)\n";
+			code += Indent + Indent + Indent + "{\n";
+			code += Indent + Indent + Indent + Indent + "var e:* = get"+MakeCamel(field.name)+"(i);\n";
+			if(vector_type.base_type == BASE_TYPE_STRUCT){
+				code += Indent + Indent + Indent + Indent + "arr.push( e.toJson() );\n";
+			}else{
+				code += Indent + Indent + Indent + Indent + "arr.push( e );\n";
+			}
+			code += Indent + Indent + Indent + "}\n";
+			
+			code += Indent + Indent + Indent + "o."+field.name+" = arr;\n";
+		}
+
 		void GenTableBuilders(const StructDef &struct_def, std::string *code_ptr){
 			GetStartOfTable(struct_def, code_ptr);
 
@@ -592,17 +661,100 @@ namespace as3{
 			GetEndOffsetOnTable(struct_def, code_ptr);
 		}
 
+		void GenFactoryFun(std::string *code_ptr){
+			std::string &code = *code_ptr;
+
+//			code += Indent + Indent + "private static var constDic:Dictionary;\n";
+
+//			code += Indent + Indent + "/**\n";
+//			code += Indent + Indent + " * get struct class(ProtocolID) name by enum protocol id\n";
+//			code += Indent + Indent + " */\n";
+//			code += Indent + Indent + "private static function getProtocolNameByID(protocolID:uint):String\n";
+//			code += Indent + Indent + "{\n";
+//			code += Indent + Indent + Indent + "if(!constDic){\n";
+//			code += Indent + Indent + Indent + Indent + "constDic = new Dictionary();\n";
+//			code += Indent + Indent + Indent + Indent + "var xml:XML = describeType(zhanqi.communicate.protocol.ProtocolID);\n";
+//			code += Indent + Indent + Indent + Indent + "var selfObj:Object = getDefinitionByName(\"zhanqi.communicate.protocol.ProtocolID\");\n";
+//			code += Indent + Indent + Indent + Indent + "var constList:XMLList = xml.constant;\n";
+//			code += Indent + Indent + Indent + Indent + "if(constList && constList.length){\n";
+//			code += Indent + Indent + Indent + Indent + Indent + "for each(var constItem:XML in constList){\n";
+//			code += Indent + Indent + Indent + Indent + Indent + Indent + "var cname:String = constItem.@name;\n";
+//			code += Indent + Indent + Indent + Indent + Indent + Indent + "var cvalue:* = selfObj[cname];\n";
+//			code += Indent + Indent + Indent + Indent + Indent + Indent + "constDic[cvalue] = cname;\n";
+//			code += Indent + Indent + Indent + Indent + Indent + "}\n";
+//			code += Indent + Indent + Indent + Indent + "}\n";
+//			code += Indent + Indent + Indent + "}\n";
+//			code += Indent + Indent + Indent + "return constDic[protocolID];\n";
+//			code += Indent + Indent + "}\n";
+
+//			code += Indent + Indent + "/**\n";
+//			code += Indent + Indent + " * get struct class by enum protocol id\n";
+//			code += Indent + Indent + " */\n";
+//			code += Indent + Indent + "public static function getProtocolById(protocolID:uint):*\n";
+//			code += Indent + Indent + "{\n";
+//			code += Indent + Indent + Indent + "var protocolName:String = getProtocolNameByID(protocolID);\n";
+//			code += Indent + Indent + Indent + "if(!protocolName)return null;\n";
+//			code += Indent + Indent + Indent + "protocolName = \"zhanqi.communicate.protocol.\"+protocolName;\n";
+//			code += Indent + Indent + Indent + "try{\n";
+//			code += Indent + Indent + Indent + Indent+ "var cl:Class = getDefinitionByName(protocolName) as Class;\n";
+//			code += Indent + Indent + Indent + Indent+ "return (new cl());\n";
+//			code += Indent + Indent + Indent + "} catch(error:Error) {}\n";
+//			code += Indent + Indent + Indent + "return null;\n";
+//			code += Indent + Indent + "}\n\n";
+
+			bool finded = false;
+			for(auto it=parser_.enums_.vec.begin(); it!=parser_.enums_.vec.end(); it++){
+				auto &enum_def = **it;
+				if(enum_def.name == "ProtocolID"){
+					finded = true;
+					break;
+				}
+			}
+			if(!finded)return;
+			
+			code += Indent + Indent + "/**\n";
+			code += Indent + Indent + " * get struct class by enum protocol id\n";
+			code += Indent + Indent + " */\n";
+			code += Indent + Indent + "public static function getProtocol(protocolID:uint):*\n";
+			code += Indent + Indent + "{\n";
+			code += Indent + Indent + Indent + "switch(protocolID)\n";
+			code += Indent + Indent + Indent + "{\n";
+			for(auto it=parser_.enums_.vec.begin(); it!=parser_.enums_.vec.end(); ++it){
+				auto &enum_def = **it;
+				if(enum_def.name == "ProtocolID"){
+					for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
+						auto &ev = **it;
+						code += Indent + Indent + Indent + Indent + "case " + NumToString(ev.value) +":\n";
+						code += Indent + Indent + Indent + Indent + "{\n";
+						code += Indent + Indent + Indent + Indent + Indent + "return new " + FullNamespace(".", *enum_def.defined_namespace)+"."+MakeCamel(ev.name)+"()\n";
+						code += Indent + Indent + Indent + Indent + Indent + "break;\n";
+						code += Indent + Indent + Indent + Indent + "}\n";
+					}
+					break;
+				}
+			}
+			code += Indent + Indent + Indent + "}\n";
+			code += Indent + Indent + "}\n\n";
+		}
+
 		void GenStruct(const StructDef &struct_def, std::string *code_ptr){
 			if(struct_def.generated)return;
 
 			GenComment(struct_def.doc_comment, code_ptr, nullptr);
 			BeginClass(struct_def, code_ptr);
 
+			std::string &code = *code_ptr;
+			
+			if(&struct_def == parser_.root_struct_def_ && parser_.opts.generate_reflector){
+				GenFactoryFun(code_ptr);
+				return;
+			}
+
 			if(!struct_def.fixed){
 				NewRootTypeFromBuffer(struct_def, code_ptr);
 			}
 
-			std::string &code = *code_ptr;
+			
 			if(!struct_def.fixed){
 				if(parser_.file_identifier_.length()){
 					code += Indent + Indent + "public static function " + struct_def.name + "Identifier():String\n";
@@ -625,6 +777,7 @@ namespace as3{
 			}
 
 			InitializeExisting(struct_def, code_ptr);
+
 			for(auto it = struct_def.fields.vec.begin(); it!=struct_def.fields.vec.end(); ++it){
 				auto &field = **it;
 				if(field.deprecated)continue;
@@ -632,11 +785,16 @@ namespace as3{
 				GenStructAccessor(struct_def, field, code_ptr);
 			}
 
+			if(parser_.opts.generate_json){
+				GenJsonBuilder(struct_def, code_ptr);
+			}
+
 			if(struct_def.fixed){
 				GenStructBuilder(struct_def, code_ptr);
 			}else{
 				GenTableBuilders(struct_def, code_ptr);
 			}
+
 			EndClass(code_ptr);
 		}
 
@@ -656,13 +814,15 @@ namespace as3{
 			code += Indent + Indent + "private static const names:Object = {";
 			for(auto it = enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
 				auto &ev = **it;
-				code += NumToString(ev.value) + ":\""+ev.name+"\", ";
+				code += NumToString(ev.value) + ":\""+ev.name+"\"";
+				if(it != --enum_def.vals.vec.end())
+					code += ",";
 			}
 			code += "};\n\n";
 
 			code += Indent + Indent + "public static function Name(e:int):String\n";
 			code += Indent + Indent + "{\n";
-			code += Indent + Indent + Indent + "if(!names.hasOwnProperty(e)){\n";
+			code += Indent + Indent + Indent + "if(!names.hasOwnProperty(e))\n";
 			code += Indent + Indent + Indent + Indent + "throw new Error('Out of Enum Index!');\n";
 			code += Indent + Indent + Indent + "return names[e];\n";
 			code += Indent + Indent + "}\n";

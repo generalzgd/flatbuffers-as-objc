@@ -77,6 +77,21 @@ package MyGame.Example
 			return obj;
 		}
 
+		/**
+		 * 转换成json对象
+		 */
+		public function toJson():Object
+		{
+			var o:Object = {};
+			o.x = getX();
+			o.y = getY();
+			o.z = getZ();
+			o.test1 = getTest1();
+			o.test2 = getTest2();
+			o.test3 = getTest3();
+			return o;
+		}
+
 
 		/**
 		 * @return int offset

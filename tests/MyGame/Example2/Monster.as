@@ -55,6 +55,15 @@ package MyGame.Example2
 		}
 
 		/**
+		 * 转换成json对象
+		 */
+		public function toJson():Object
+		{
+			var o:Object = {};
+			return o;
+		}
+
+		/**
 		 * @param FlatBufferBuilder builder
 		 * @return void
 		 */

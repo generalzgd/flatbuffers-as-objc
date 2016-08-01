@@ -11,11 +11,50 @@ package Jason.Flat.Test
 
 	import zgd.google.flatbuffers.*;
 	import flash.utils.ByteArray;
+	import flash.utils.Dictionary;
+	import flash.utils.describeType;
+	import flash.utils.getDefinitionByName;
 
 
 	///文理结构
 	public class Texture extends Table
 	{
+		private static var constDic:Dictionary;
+		/**
+		 * get struct class(ProtocolID) name by enum protocol id
+		 */
+		private static function getProtocolNameByID(protocolID:uint):String
+		{
+			if(!constDic){
+				constDic = new Dictionary();
+				var xml:XML = describeType(zhanqi.communicate.protocol.ProtocolID);
+				var selfObj:Object = getDefinitionByName("zhanqi.communicate.protocol.ProtocolID");
+				var constList:XMLList = xml.constant;
+				if(constList && constList.length){
+					for each(var constItem:XML in constList){
+						var cname:String = constItem.@name;
+						var cvalue:* = selfObj[cname];
+						constDic[cvalue] = cname;
+					}
+				}
+			}
+			return constDic[protocolID];
+		}
+		/**
+		 * get struct class by enum protocol id
+		 */
+		public static function getProtocolById(protocolID:uint):*
+		{
+			var protocolName:String = getProtocolNameByID(protocolID);
+			if(!protocolName)return null;
+			protocolName = "zhanqi.communicate.protocol."+protocolName;
+			try{
+				var cl:Class = getDefinitionByName(protocolName) as Class;
+				return (new cl());
+			} catch(error:Error) {}
+			return null;
+		}
+
 		/**
 		 * @param ByteArray inData
 		 * @return Texture
@@ -40,6 +79,9 @@ package Jason.Flat.Test
 			return this;
 		}
 
+		/**
+		 * @return String
+		 */
 		public function getTextureName():String
 		{
 			var o:int = this.__offset(4);
@@ -92,12 +134,41 @@ package Jason.Flat.Test
 			return o!=0?this.bb.getShort(o+this.bb_pos):0;
 		}
 
+		/**
+		 * @return TestAppend
+		 */
 		public function getTestAppend():TestAppend
 		{
 			var obj:TestAppend = new TestAppend();
 			var o:int = this.__offset(16);
 			o!=0?obj.init(this.__indirect(o + this.bb_pos), this.bb) : 0;
-			return obj
+			return obj;
+		}
+
+		/**
+		 * change to json object
+		 */
+		public function toJson():Object
+		{
+			var o:Object = {};
+			var arr:Array;
+			var len:int;
+			var i:int;
+			o.texture_name = getTextureName();
+			o.num_textures = getNumTextures();
+			arr = [];
+			len = getTexturesLength();
+			for(i=0; i<len; ++i)
+			{
+				var e:* = getTextures(i);
+				arr.push( e.toJson() );
+			}
+			o.textures = arr;
+			o.num_test = getNumTest();
+			o.num_test1 = 0;
+			o.num_test2 = getNumTest2();
+			o.test_append = getTestAppend().toJson();
+			return o;
 		}
 
 		/**

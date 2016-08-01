@@ -82,6 +82,18 @@ package MyGame.Example
 		}
 
 		/**
+		 * 转换成json对象
+		 */
+		public function toJson():Object
+		{
+			var o:Object = {};
+			o.id = getId();
+			o.val = getVal();
+			o.count = getCount();
+			return o;
+		}
+
+		/**
 		 * @param FlatBufferBuilder builder
 		 * @return void
 		 */

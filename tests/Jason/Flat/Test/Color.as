@@ -11,15 +11,15 @@ package Jason.Flat.Test
 
 	public class Color
 	{
-		public static const Rad = 1;
-		public static const Green = 2;
-		public static const Blue = 3;
+		public static const Rad:int = 1;
+		public static const Green:int = 2;
+		public static const Blue:int = 3;
 
-		private static const names:Array = ["Rad", "Green", "Blue", ];
+		private static const names:Object = {1:"Rad",2:"Green",3:"Blue"};
 
 		public static function Name(e:int):String
 		{
-			if(!names[e]){
+			if(!names.hasOwnProperty(e))
 				throw new Error('Out of Enum Index!');
 			return names[e];
 		}

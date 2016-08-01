@@ -43,6 +43,17 @@ package MyGame.Example
 			return this.bb.getByte(this.bb_pos + 2);
 		}
 
+		/**
+		 * 转换成json对象
+		 */
+		public function toJson():Object
+		{
+			var o:Object = {};
+			o.a = getA();
+			o.b = getB();
+			return o;
+		}
+
 
 		/**
 		 * @return int offset

@@ -64,6 +64,16 @@ package MyGame.Example
 		}
 
 		/**
+		 * 转换成json对象
+		 */
+		public function toJson():Object
+		{
+			var o:Object = {};
+			o.color = getColor();
+			return o;
+		}
+
+		/**
 		 * @param FlatBufferBuilder builder
 		 * @return void
 		 */

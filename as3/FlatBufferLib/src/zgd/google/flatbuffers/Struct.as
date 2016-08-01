@@ -16,5 +16,8 @@ package zgd.google.flatbuffers
 		 * 
 		 */		
 		protected var bb:ByteBuffer;
+		
+		
+		
 	}
 }

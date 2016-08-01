@@ -59,6 +59,17 @@ package Jason.Flat.Test
 		}
 
 		/**
+		 * change to json object
+		 */
+		public function toJson():Object
+		{
+			var o:Object = {};
+			o.test_num = getTestNum();
+			o.test_num2 = getTestNum2();
+			return o;
+		}
+
+		/**
 		 * @param FlatBufferBuilder builder
 		 * @return void
 		 */

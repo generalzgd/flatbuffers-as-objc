@@ -402,6 +402,43 @@ package MyGame.Example
 		}
 
 		/**
+		 * 转换成json对象
+		 */
+		public function toJson():Object
+		{
+			var o:Object = {};
+			o.pos = getPos();
+			o.mana = getMana();
+			o.hp = getHp();
+			o.name = getName();
+			o.friendly = false			o.inventory = getInventory();
+			o.color = getColor();
+			o.test_type = getTestType();
+			o.test = getTest();
+			o.test4 = getTest4();
+			o.testarrayofstring = getTestarrayofstring();
+			o.testarrayoftables = getTestarrayoftables();
+			o.enemy = getEnemy();
+			o.testnestedflatbuffer = getTestnestedflatbuffer();
+			o.testempty = getTestempty();
+			o.testbool = getTestbool();
+			o.testhashs32_fnv1 = getTesthashs32Fnv1();
+			o.testhashu32_fnv1 = getTesthashu32Fnv1();
+			o.testhashs64_fnv1 = getTesthashs64Fnv1();
+			o.testhashu64_fnv1 = getTesthashu64Fnv1();
+			o.testhashs32_fnv1a = getTesthashs32Fnv1a();
+			o.testhashu32_fnv1a = getTesthashu32Fnv1a();
+			o.testhashs64_fnv1a = getTesthashs64Fnv1a();
+			o.testhashu64_fnv1a = getTesthashu64Fnv1a();
+			o.testarrayofbools = getTestarrayofbools();
+			o.testf = getTestf();
+			o.testf2 = getTestf2();
+			o.testf3 = getTestf3();
+			o.testarrayofstring2 = getTestarrayofstring2();
+			return o;
+		}
+
+		/**
 		 * @param FlatBufferBuilder builder
 		 * @return void
 		 */
