@@ -223,6 +223,12 @@ package zgd.google.flatbuffers
 			putSbyte(x);
 		}
 		
+		public function addUbyte(x:int):void
+		{
+			prep(Constants.SIZEOF_BYTE, 0);
+			putUbyte(x);
+		}
+		
 		public function addShort(x:int):void
 		{
 			prep(Constants.SIZEOF_SHORT, 0);
@@ -309,6 +315,15 @@ package zgd.google.flatbuffers
 			if(force_defaults || x != d)
 			{
 				addSbyte(x);
+				slot(o);
+			}
+		}
+		
+		public function addUbyteX(o:int, x:int, d:int):void
+		{
+			if(force_defaults || x != d)
+			{
+				addUbyte(x);
 				slot(o);
 			}
 		}

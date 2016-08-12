@@ -664,44 +664,6 @@ namespace as3{
 		void GenFactoryFun(std::string *code_ptr){
 			std::string &code = *code_ptr;
 
-//			code += Indent + Indent + "private static var constDic:Dictionary;\n";
-
-//			code += Indent + Indent + "/**\n";
-//			code += Indent + Indent + " * get struct class(ProtocolID) name by enum protocol id\n";
-//			code += Indent + Indent + " */\n";
-//			code += Indent + Indent + "private static function getProtocolNameByID(protocolID:uint):String\n";
-//			code += Indent + Indent + "{\n";
-//			code += Indent + Indent + Indent + "if(!constDic){\n";
-//			code += Indent + Indent + Indent + Indent + "constDic = new Dictionary();\n";
-//			code += Indent + Indent + Indent + Indent + "var xml:XML = describeType(zhanqi.communicate.protocol.ProtocolID);\n";
-//			code += Indent + Indent + Indent + Indent + "var selfObj:Object = getDefinitionByName(\"zhanqi.communicate.protocol.ProtocolID\");\n";
-//			code += Indent + Indent + Indent + Indent + "var constList:XMLList = xml.constant;\n";
-//			code += Indent + Indent + Indent + Indent + "if(constList && constList.length){\n";
-//			code += Indent + Indent + Indent + Indent + Indent + "for each(var constItem:XML in constList){\n";
-//			code += Indent + Indent + Indent + Indent + Indent + Indent + "var cname:String = constItem.@name;\n";
-//			code += Indent + Indent + Indent + Indent + Indent + Indent + "var cvalue:* = selfObj[cname];\n";
-//			code += Indent + Indent + Indent + Indent + Indent + Indent + "constDic[cvalue] = cname;\n";
-//			code += Indent + Indent + Indent + Indent + Indent + "}\n";
-//			code += Indent + Indent + Indent + Indent + "}\n";
-//			code += Indent + Indent + Indent + "}\n";
-//			code += Indent + Indent + Indent + "return constDic[protocolID];\n";
-//			code += Indent + Indent + "}\n";
-
-//			code += Indent + Indent + "/**\n";
-//			code += Indent + Indent + " * get struct class by enum protocol id\n";
-//			code += Indent + Indent + " */\n";
-//			code += Indent + Indent + "public static function getProtocolById(protocolID:uint):*\n";
-//			code += Indent + Indent + "{\n";
-//			code += Indent + Indent + Indent + "var protocolName:String = getProtocolNameByID(protocolID);\n";
-//			code += Indent + Indent + Indent + "if(!protocolName)return null;\n";
-//			code += Indent + Indent + Indent + "protocolName = \"zhanqi.communicate.protocol.\"+protocolName;\n";
-//			code += Indent + Indent + Indent + "try{\n";
-//			code += Indent + Indent + Indent + Indent+ "var cl:Class = getDefinitionByName(protocolName) as Class;\n";
-//			code += Indent + Indent + Indent + Indent+ "return (new cl());\n";
-//			code += Indent + Indent + Indent + "} catch(error:Error) {}\n";
-//			code += Indent + Indent + Indent + "return null;\n";
-//			code += Indent + Indent + "}\n\n";
-
 			bool finded = false;
 			for(auto it=parser_.enums_.vec.begin(); it!=parser_.enums_.vec.end(); it++){
 				auto &enum_def = **it;
@@ -715,7 +677,7 @@ namespace as3{
 			code += Indent + Indent + "/**\n";
 			code += Indent + Indent + " * get struct class by enum protocol id\n";
 			code += Indent + Indent + " */\n";
-			code += Indent + Indent + "public static function getProtocol(protocolID:uint):*\n";
+			code += Indent + Indent + "public static function getProtocol(protocolID:uint, bytes:ByteArray):*\n";
 			code += Indent + Indent + "{\n";
 			code += Indent + Indent + Indent + "switch(protocolID)\n";
 			code += Indent + Indent + Indent + "{\n";
@@ -725,7 +687,7 @@ namespace as3{
 					for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
 						auto &ev = **it;
 						code += Indent + Indent + Indent + Indent + "case " + NumToString(ev.value) +":\n";
-						code += Indent + Indent + Indent + Indent + Indent + "return new " + FullNamespace(".", *enum_def.defined_namespace)+"."+MakeCamel(ev.name)+"();break;\n";
+						code += Indent + Indent + Indent + Indent + Indent + "return " + FullNamespace(".", *enum_def.defined_namespace)+"."+MakeCamel(ev.name)+".getRootAs"+MakeCamel(ev.name)+"(bytes);\n";
 					}
 					break;
 				}
