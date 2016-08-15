@@ -164,7 +164,8 @@ std::string Namespace::GetFullyQualifiedName(const std::string &name,
   TD(Include, 269, "include") \
   TD(Attribute, 270, "attribute") \
   TD(Null, 271, "null") \
-  TD(Service, 272, "rpc_service")
+  TD(Service, 272, "rpc_service") \
+  TD(FactoryType, 273, "factory_type")
 #ifdef __GNUC__
 __extension__  // Stop GCC complaining about trailing comma with -Wpendantic.
 #endif
@@ -394,6 +395,10 @@ CheckedError Parser::Next() {
             token_ = kTokenRootType;
             return NoError();
           }
+		  if (attribute_ == "factory_type") {
+			token_ = kTokenFactoryType;
+			return NoError();
+		  }
           if (attribute_ == "include") {
             token_ = kTokenInclude;
             return NoError();
@@ -1417,6 +1422,14 @@ bool Parser::SetRootType(const char *name) {
   return root_struct_def_ != nullptr;
 }
 
+//Only use enum type to factory
+bool Parser::SetFactoryType(const char* name){
+	factory_enum_def_ = enums_.Lookup(name);
+	if(!factory_enum_def_)
+		factory_enum_def_ = enums_.Lookup(namespaces_.back()->GetFullyQualifiedName(name));
+	return factory_enum_def_ != nullptr;
+}
+
 void Parser::MarkGenerated() {
   // This function marks all existing definitions as having already
   // been generated, which signals no code for included files should be
@@ -1886,6 +1899,14 @@ CheckedError Parser::DoParse(const char *source, const char **include_paths,
       if (root_struct_def_->fixed)
         return Error("root type must be a table");
       EXPECT(';');
+	} else if (token_ == kTokenFactoryType) {
+		NEXT();
+		auto factory_type = attribute_;
+		EXPECT(kTokenIdentifier);
+		ECHECK(ParseNamespacing(&factory_type, nullptr));
+		if(!SetFactoryType(factory_type.c_str()))
+			return Error("unknown factory type: " + factory_type);
+		EXPECT(';');
     } else if (token_ == kTokenFileIdentifier) {
       NEXT();
       file_identifier_ = attribute_;

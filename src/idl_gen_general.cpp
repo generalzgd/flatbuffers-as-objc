@@ -200,21 +200,24 @@ class GeneralGenerator : public BaseGenerator {
   bool generate() {
     std::string one_file_code;
 
-    for (auto it = parser_.enums_.vec.begin(); it != parser_.enums_.vec.end();
-         ++it) {
+    for (auto it = parser_.enums_.vec.begin(); it != parser_.enums_.vec.end(); ++it) {
       std::string enumcode;
       auto &enum_def = **it;
       GenEnum(enum_def, &enumcode);
       if (parser_.opts.one_file) {
         one_file_code += enumcode;
       } else {
-        if (!SaveType(enum_def.name, *enum_def.defined_namespace,
-                      enumcode, false)) return false;
+        if (!SaveType(enum_def.name, *enum_def.defined_namespace, enumcode, false)) return false;
       }
+
+	  if(&enum_def == parser_.factory_enum_def_){
+		  std::string enumcode;
+		  GenFactory(enum_def, &enumcode);
+		  if (!SaveFactoryType(enum_def.name, *enum_def.defined_namespace, enumcode, false)) return false;
+	  }
     }
 
-    for (auto it = parser_.structs_.vec.begin();
-         it != parser_.structs_.vec.end(); ++it) {
+    for (auto it = parser_.structs_.vec.begin(); it != parser_.structs_.vec.end(); ++it) {
       std::string declcode;
       auto &struct_def = **it;
       GenStruct(struct_def, &declcode);
@@ -250,6 +253,26 @@ class GeneralGenerator : public BaseGenerator {
     code += classcode;
     if (!namespace_name.empty()) code += lang_.namespace_end;
     auto filename = NamespaceDir(ns) + defname + lang_.file_extension;
+    return SaveFile(filename.c_str(), code, false);
+  }
+
+  // Save out the generated code for a single class while adding
+  // declaration boilerplate.
+  bool SaveFactoryType(const std::string &defname, const Namespace &ns, 
+  	  const std::string &classcode, bool needs_includes) {
+    if (!classcode.length()) return true;
+
+    std::string code;
+    code = code + "// " + FlatBuffersGeneratedWarning();
+    std::string namespace_name = FullNamespace(".", ns);
+    if (!namespace_name.empty()) {
+      code += lang_.namespace_ident + namespace_name + lang_.namespace_begin;
+      code += "\n\n";
+    }
+    if (needs_includes) code += lang_.includes;
+    code += classcode;
+    if (!namespace_name.empty()) code += lang_.namespace_end;
+    auto filename = NamespaceDir(ns) + defname + "Factory" + lang_.file_extension;
     return SaveFile(filename.c_str(), code, false);
   }
 
@@ -500,6 +523,31 @@ std::string GenDefaultValueBasic(const Value &value) {
   return GenDefaultValueBasic(value, true);
 }
 
+void GenFactory(const EnumDef &enum_def, std::string *code_ptr){
+	std::string &code = *code_ptr;
+
+	std::string Indent = " ";
+
+	code += Indent + "public class " + enum_def.name + "Factory\n";
+	code += Indent + "{\n";
+	code += Indent + Indent + "/**\n";
+	code += Indent + Indent + " * get struct class by enum protocol id\n";
+	code += Indent + Indent + " */\n";
+	code += Indent + Indent + "public static Object function getProtocol(uint protocolId, ByteBuffer bytes)\n";
+	code += Indent + Indent + "{\n";
+	code += Indent + Indent + Indent + "switch(protocolId)\n";
+	code += Indent + Indent + Indent + "{\n";
+	for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
+		auto &ev = **it;
+	code += Indent + Indent + Indent + "case " + NumToString(ev.value) +":\n";
+	code += Indent + Indent + Indent + Indent + "return " + FullNamespace(".", *enum_def.defined_namespace)+"."+MakeCamel(ev.name)+".getRootAs"+MakeCamel(ev.name)+"(bytes);\n";
+	}	
+	code += Indent + Indent + Indent + "}\n";
+	code += Indent + Indent + Indent + "return null;\n";
+	code += Indent + Indent + "}\n\n";
+	code += Indent + "}\n\n";
+}
+
 void GenEnum(EnumDef &enum_def, std::string *code_ptr) {
   std::string &code = *code_ptr;
   if (enum_def.generated) return;
@@ -668,43 +716,7 @@ void GenStructBody(const StructDef &struct_def, std::string *code_ptr, const cha
   }
 }
 
-void GenFactoryFun(std::string *code_ptr){
-	std::string &code = *code_ptr;
 
-	std::string Indent = " ";
-
-	bool finded = false;
-	for(auto it=parser_.enums_.vec.begin(); it!=parser_.enums_.vec.end(); it++){
-		auto &enum_def = **it;
-		if(enum_def.name == "ProtocolID"){
-			finded = true;
-			break;
-		}
-	}
-	if(!finded)return;
-			
-	code += Indent + "/**\n";
-	code += Indent + " * get struct class by enum protocol id\n";
-	code += Indent + " */\n";
-	code += Indent + "public static Object function getProtocol(uint protocolID)\n";
-	code += Indent + "{\n";
-	code += Indent + Indent + "switch(protocolID)\n";
-	code += Indent + Indent + "{\n";
-	for(auto it=parser_.enums_.vec.begin(); it!=parser_.enums_.vec.end(); ++it){
-		auto &enum_def = **it;
-		if(enum_def.name == "ProtocolID"){
-			for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
-				auto &ev = **it;
-				code += Indent + Indent + Indent + "case " + NumToString(ev.value) +":\n";
-				code += Indent + Indent + Indent + Indent + "return new " + FullNamespace(".", *enum_def.defined_namespace)+"."+MakeCamel(ev.name)+"();break;\n";
-			}
-			break;
-		}
-	}
-	code += Indent + Indent + "}\n";
-	code += Indent + Indent + "return null;\n";
-	code += Indent + "}\n\n";
-}
 
 void GenStruct(StructDef &struct_def, std::string *code_ptr) {
   if (struct_def.generated) return;
@@ -730,11 +742,11 @@ void GenStruct(StructDef &struct_def, std::string *code_ptr) {
   code += struct_def.fixed ? "Struct" : "Table";
   code += " {\n";
 
-  if(&struct_def == parser_.root_struct_def_ && parser_.opts.generate_reflector){
-	GenFactoryFun(code_ptr);
-	code += "}\n";
-	return;
-  }
+//  if(&struct_def == parser_.root_struct_def_ && parser_.opts.generate_reflector){
+//	GenFactoryFun(code_ptr);
+//	code += "}\n";
+//	return;
+//  }
 
   if (!struct_def.fixed) {
     // Generate a special accessor for the table that when used as the root

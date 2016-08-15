@@ -564,7 +564,7 @@ inline voffset_t FieldIndexToOffset(voffset_t field_id) {
 // "scalar_size" scalar if the buffer had grown to "buf_size" (downwards in
 // memory).
 inline size_t PaddingBytes(size_t buf_size, size_t scalar_size) {
-	int tmp = ((~buf_size) + 1) & (scalar_size - 1);
+	//int tmp = ((~buf_size) + 1) & (scalar_size - 1);
   return ((~buf_size) + 1) & (scalar_size - 1);
 }
 /// @endcond
@@ -778,7 +778,7 @@ FLATBUFFERS_FINAL_CLASS
     // Write a vtable, which consists entirely of voffset_t elements.
     // It starts with the number of offsets, followed by a type id, followed
     // by the offsets themselves. In reverse:
-	int tmp = sizeof(voffset_t);
+	//int tmp = sizeof(voffset_t);
     buf_.fill(numfields * sizeof(voffset_t));
     auto table_object_size = vtableoffsetloc - start;
     assert(table_object_size < 0x10000);  // Vtable use 16bit offsets.

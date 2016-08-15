@@ -46,6 +46,12 @@ namespace php {
           std::string enumcode;
           GenEnum(enum_def, &enumcode);
           if (!SaveType(enum_def, enumcode, false)) return false;
+
+		  if(&enum_def == parser_.factory_enum_def_){
+			std::string enumcode;
+			GenFactory(enum_def, &enumcode);
+			if(!SaveFactoryType(enum_def, enumcode, true))return false;
+		  }
         }
         return true;
       }
@@ -79,8 +85,7 @@ namespace php {
       }
 
       // Save out the generated code for a Php Table type.
-      bool SaveType(const Definition &def, const std::string &classcode,
-                    bool needs_imports) {
+      bool SaveType(const Definition &def, const std::string &classcode, bool needs_imports) {
         if (!classcode.length()) return true;
 
         std::string code = "";
@@ -90,6 +95,19 @@ namespace php {
 
         std::string filename = NamespaceDir(*def.defined_namespace) +
                                kPathSeparator + def.name + ".php";
+        return SaveFile(filename.c_str(), code, false);
+      }
+
+	  // Save out the generated code for a Php Table type.
+      bool SaveFactoryType(const Definition &def, const std::string &classcode, bool needs_imports) {
+        if (!classcode.length()) return true;
+
+        std::string code = "";
+        BeginFile(FullNamespace("\\", *def.defined_namespace),
+                  needs_imports, &code);
+        code += classcode;
+
+        std::string filename = NamespaceDir(*def.defined_namespace) + kPathSeparator + def.name + "Factory.php";
         return SaveFile(filename.c_str(), code, false);
       }
       
@@ -756,40 +774,29 @@ namespace php {
       GetEndOffsetOnTable(struct_def, code_ptr);
     }
 
-	void GenFactoryFun(std::string *code_ptr){
+	void GenFactory(const EnumDef &enum_def, std::string *code_ptr){
 		std::string &code = *code_ptr;
 
-		bool finded = false;
-		for(auto it=parser_.enums_.vec.begin(); it!=parser_.enums_.vec.end(); it++){
-			auto &enum_def = **it;
-			if(enum_def.name == "ProtocolID"){
-				finded = true;
-				break;
-			}
-		}
-		if(!finded)return;
-			
-		code += Indent + Indent + "/**\n";
-		code += Indent + Indent + " * get struct class by enum protocol id\n";
-		code += Indent + Indent + " */\n";
-		code += Indent + Indent + "public static function getProtocol(protocolID)\n";
+		code += "public class " + enum_def.name + "Factory\n";
+		code += "{\n";
+		code += Indent + "/**\n";
+		code += Indent + " * get struct class by enum protocol id\n";
+		code += Indent + " */\n";
+		code += Indent + "public static function getProtocol($protocolId, ByteBuffer $bb):*\n";
+		code += Indent + "{\n";
+		code += Indent + Indent + "switch($protocolId)\n";
 		code += Indent + Indent + "{\n";
-		code += Indent + Indent + Indent + "switch(protocolID)\n";
-		code += Indent + Indent + Indent + "{\n";
-		for(auto it=parser_.enums_.vec.begin(); it!=parser_.enums_.vec.end(); ++it){
-			auto &enum_def = **it;
-			if(enum_def.name == "ProtocolID"){
-				for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
-					auto &ev = **it;
-					code += Indent + Indent + Indent + Indent + "case " + NumToString(ev.value) +":\n";
-					code += Indent + Indent + Indent + Indent + Indent + "return new " + FullNamespace(".", *enum_def.defined_namespace)+"."+MakeCamel(ev.name)+"();break;\n";
-				}
-				break;
-			}
+			
+		for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
+			auto &ev = **it;
+		code += Indent + Indent + Indent + "case " + NumToString(ev.value) +":\n";
+		code += Indent + Indent + Indent + Indent + "return " + FullNamespace(".", *enum_def.defined_namespace)+"."+MakeCamel(ev.name)+".getRootAs"+MakeCamel(ev.name)+"($bb);\n";
 		}
-		code += Indent + Indent + Indent + "}\n";
-		code += Indent + Indent + Indent + "return null;\n";
-		code += Indent + Indent + "}\n\n";
+		
+		code += Indent + Indent + "}\n";
+		code += Indent + Indent + "return null;\n";
+		code += Indent + "}\n\n";
+		code += "}\n\n";
 	}
 
     // Generate struct or table methods.
@@ -800,10 +807,10 @@ namespace php {
       GenComment(struct_def.doc_comment, code_ptr, nullptr);
       BeginClass(struct_def, code_ptr);
 
-	  if(&struct_def == parser_.root_struct_def_ && parser_.opts.generate_reflector){
-		  GenFactoryFun(code_ptr);
-		  return;
-	  }
+//	  if(&struct_def == parser_.root_struct_def_ && parser_.opts.generate_reflector){
+//		  GenFactoryFun(code_ptr);
+//		  return;
+//	  }
 
       if (!struct_def.fixed) {
         // Generate a special accessor for the table that has been declared as

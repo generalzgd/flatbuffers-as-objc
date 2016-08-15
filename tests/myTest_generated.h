@@ -249,6 +249,18 @@ inline bool VerifyTextureBuffer(flatbuffers::Verifier &verifier) { return verifi
 
 inline void FinishTextureBuffer(flatbuffers::FlatBufferBuilder &fbb, flatbuffers::Offset<Jason::Flat::Test::Texture> root) { fbb.Finish(root); }
 
+void* ColorFactory(uint32_t protocolId, const void* buf){
+	switch(protocolId){
+		case 1:
+			return GetRad(buf);
+		case 2:
+			return GetGreen(buf);
+		case 3:
+			return GetBlue(buf);
+	}
+	return nullptr;
+}
+
 }  // namespace Test
 }  // namespace Flat
 }  // namespace Jason

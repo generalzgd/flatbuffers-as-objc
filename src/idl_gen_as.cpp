@@ -42,9 +42,15 @@ namespace as3{
 				auto &enum_def = **it;
 
 				std::string enumcode;
-				GenEnum(enum_def, &enumcode);
 
+				GenEnum(enum_def, &enumcode);
 				if(!SaveType(enum_def, enumcode, false))return false;
+				
+				if(&enum_def == parser_.factory_enum_def_){
+					std::string enumcode;
+					GenFactory(enum_def, &enumcode);
+					if(!SaveFactoryType(enum_def, enumcode, true))return false;
+				}
 			}
 			return true;
 		}
@@ -76,15 +82,24 @@ namespace as3{
 			if(needs_imports){
 				code += Indent + "import zgd.google.flatbuffers.*;\n";
 				code += Indent + "import flash.utils.ByteArray;\n";
-				
-				/*if(bRoot && parser_.opts.generate_reflector){
-					code += Indent + "import flash.utils.Dictionary;\n";
-					code += Indent + "import flash.utils.describeType;\n";
-					code += Indent + "import flash.utils.getDefinitionByName;\n";
-				}*/
-				
 				code += "\n\n";
 			}
+		}
+
+		bool SaveFactoryType(const Definition &def, const std::string &classcode, bool needs_imports){
+			if(!classcode.length())
+				return true;
+
+			std::string code = "";
+			BeginFile(FullNamespace(".", *def.defined_namespace), needs_imports, &code);
+
+			code += classcode;
+
+			code += "\n\n}";//°ü½áÊøÀ¨ºÅ
+
+			std::string filename = NamespaceDir(*def.defined_namespace) + kPathSeparator + def.name + "Factory.as";
+
+			return SaveFile(filename.c_str(), code, false);
 		}
 
 		bool SaveType(const Definition &def, const std::string &classcode, bool needs_imports){
@@ -697,6 +712,31 @@ namespace as3{
 			code += Indent + Indent + "}\n\n";
 		}
 
+		void GenFactory(const EnumDef &enum_def, std::string *code_ptr){
+			std::string &code = *code_ptr;
+
+			code += Indent + "public class " + enum_def.name + "Factory\n";
+			code += Indent + "{\n";
+			code += Indent + Indent + "/**\n";
+			code += Indent + Indent + " * get struct class by enum protocol id\n";
+			code += Indent + Indent + " */\n";
+			code += Indent + Indent + "public static function getProtocol(protocolId:uint, bytes:ByteArray):*\n";
+			code += Indent + Indent + "{\n";
+			code += Indent + Indent + Indent + "switch(protocolId)\n";
+			code += Indent + Indent + Indent + "{\n";
+			
+			for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
+				auto &ev = **it;
+			code += Indent + Indent + Indent + Indent + "case " + NumToString(ev.value) +":\n";
+			code += Indent + Indent + Indent + Indent + Indent + "return " + FullNamespace(".", *enum_def.defined_namespace)+"."+MakeCamel(ev.name)+".getRootAs"+MakeCamel(ev.name)+"(bytes);\n";
+			}
+		
+			code += Indent + Indent + Indent + "}\n";
+			code += Indent + Indent + Indent + "return null;\n";
+			code += Indent + Indent + "}\n\n";
+			code += Indent + "}\n\n";
+		}
+
 		void GenStruct(const StructDef &struct_def, std::string *code_ptr){
 			if(struct_def.generated)return;
 
@@ -705,10 +745,10 @@ namespace as3{
 
 			std::string &code = *code_ptr;
 			
-			if(&struct_def == parser_.root_struct_def_ && parser_.opts.generate_reflector){
-				GenFactoryFun(code_ptr);
-				return;
-			}
+			//if(&struct_def == parser_.root_struct_def_ && parser_.opts.generate_reflector){
+			//	GenFactoryFun(code_ptr);
+			//	return;
+			//}
 
 			if(!struct_def.fixed){
 				NewRootTypeFromBuffer(struct_def, code_ptr);

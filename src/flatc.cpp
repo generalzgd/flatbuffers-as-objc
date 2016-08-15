@@ -222,13 +222,11 @@ int main(int argc, const char *argv[]) {
         exit(0);
 	  } else if(arg == "--gen-json"){
 		  opts.generate_json = true;
-	  } else if(arg == "--gen-reflect"){
-		  opts.generate_reflector = true;
+	 // } else if(arg == "--gen-reflect"){
+	//	  opts.generate_reflector = true;
       } else {
         for (size_t i = 0; i < num_generators; ++i) {
-          if (arg == generators[i].generator_opt_long ||
-              (generators[i].generator_opt_short &&
-               arg == generators[i].generator_opt_short)) {
+          if (arg == generators[i].generator_opt_long || (generators[i].generator_opt_short && arg == generators[i].generator_opt_short)) {
             generator_enabled[i] = true;
             any_generator = true;
             goto found;
@@ -253,9 +251,7 @@ int main(int argc, const char *argv[]) {
 
   // Now process the files:
   parser = new flatbuffers::Parser(opts);
-  for (auto file_it = filenames.begin();
-            file_it != filenames.end();
-          ++file_it) {
+  for (auto file_it = filenames.begin(); file_it != filenames.end(); ++file_it) {
       std::string contents;
       if (!flatbuffers::LoadFile(file_it->c_str(), true, &contents))
         Error("unable to load file: " + *file_it);
@@ -313,8 +309,7 @@ int main(int argc, const char *argv[]) {
         include_directories.pop_back();
       }
 
-      std::string filebase = flatbuffers::StripPath(
-                               flatbuffers::StripExtension(*file_it));
+      std::string filebase = flatbuffers::StripPath(flatbuffers::StripExtension(*file_it));
 
       for (size_t i = 0; i < num_generators; ++i) {
         parser->opts.lang = generators[i].lang;

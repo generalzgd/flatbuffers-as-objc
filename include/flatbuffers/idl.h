@@ -339,7 +339,7 @@ struct IDLOptions {
   bool generate_name_strings;
   bool escape_proto_identifiers;
   bool generate_json;
-  bool generate_reflector;
+  //bool generate_reflector;
   
   // Possible options for the more general generator below.
   enum Language { kJava, kCSharp, kGo,  kMAX };
@@ -361,8 +361,7 @@ struct IDLOptions {
       generate_name_strings(false),
       escape_proto_identifiers(false),
       lang(IDLOptions::kJava),
-	  generate_json(false),
-	  generate_reflector(false) {}
+	  generate_json(false) {}
 };
 
 // This encapsulates where the parser is in the current source file.
@@ -463,6 +462,9 @@ class Parser : public ParserState {
   // Set the root type. May override the one set in the schema.
   bool SetRootType(const char *name);
 
+  // Set the factory class, auto make reflect type table
+  bool SetFactoryType(const char *name);
+
   // Mark all definitions as already having code generated.
   void MarkGenerated();
 
@@ -545,6 +547,7 @@ private:
 
   FlatBufferBuilder builder_;  // any data contained in the file
   StructDef *root_struct_def_;
+  EnumDef *factory_enum_def_;
   std::string file_identifier_;
   std::string file_extension_;
 

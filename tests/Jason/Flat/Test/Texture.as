@@ -16,6 +16,256 @@ package Jason.Flat.Test
 	///文理结构
 	public class Texture extends Table
 	{
+		/**
+		 * @param ByteArray inData
+		 * @return Texture
+		 */
+		public static function getRootAsTexture(inData:ByteArray):Texture
+		{
+			var bb:ByteBuffer = ByteBuffer.wrap(inData);
+			var obj:Texture = new Texture();
+			obj.init(bb.getInt(bb.getPosition()) + bb.getPosition(), bb);
+			return obj;
+		}
+
+		/**
+		 * @param int i offset
+		 * @param ByteBuffer bb
+		 * @return Texture
+		 */
+		public function init(i:int, bb:ByteBuffer):Texture
+		{
+			this.bb_pos = i;
+			this.bb = bb;
+			return this;
+		}
+
+		/**
+		 * @return String
+		 */
+		public function getTextureName():String
+		{
+			var o:int = this.__offset(4);
+			return o != 0?this.__string(o + this.bb_pos):null;
+		}
+
+		/**
+		 * @return int
+		 */
+		public function getNumTextures():int
+		{
+			var o:int = this.__offset(6);
+			return o!=0?this.bb.getShort(o+this.bb_pos):0;
+		}
+
+		/**
+		 * @return *
+		 */
+		public function getTextures(j:int):*
+		{
+			var o:int = this.__offset(8);
+			var obj:TextureData = new TextureData();
+			return o!=0?obj.init(this.__indirect(this.__vector(o) + j * 4), this.bb):null;
+		}
+
+		/**
+		 * @return int
+		 */
+		public function getTexturesLength():int
+		{
+			var o:int = this.__offset(8);
+			return o!=0?this.__vector_len(o):0;
+		}
+
+		/**
+		 * @return int
+		 */
+		public function getNumTest():int
+		{
+			var o:int = this.__offset(10);
+			return o!=0?this.bb.getShort(o+this.bb_pos):30;
+		}
+
+		/**
+		 * @return int
+		 */
+		public function getNumTest2():int
+		{
+			var o:int = this.__offset(14);
+			return o!=0?this.bb.getShort(o+this.bb_pos):0;
+		}
+
+		/**
+		 * @return TestAppend
+		 */
+		public function getTestAppend():TestAppend
+		{
+			var obj:TestAppend = new TestAppend();
+			var o:int = this.__offset(16);
+			o!=0?obj.init(this.__indirect(o + this.bb_pos), this.bb) : 0;
+			return obj;
+		}
+
+		/**
+		 * change to json object
+		 */
+		public function toJson():Object
+		{
+			var o:Object = {};
+			var arr:Array;
+			var len:int;
+			var i:int;
+			o.texture_name = getTextureName();
+			o.num_textures = getNumTextures();
+			arr = [];
+			len = getTexturesLength();
+			for(i=0; i<len; ++i)
+			{
+				var e:* = getTextures(i);
+				arr.push( e.toJson() );
+			}
+			o.textures = arr;
+			o.num_test = getNumTest();
+			o.num_test1 = 0;
+			o.num_test2 = getNumTest2();
+			o.test_append = getTestAppend().toJson();
+			return o;
+		}
+
+		/**
+		 * @param FlatBufferBuilder builder
+		 * @return void
+		 */
+		public static function startTexture(builder:FlatBufferBuilder):void
+		{
+			builder.startObject(7);
+		}
+
+		/**
+		 * @param FlatBufferBuilder builder
+		 * @param (if type is * means int offset value)
+		 * @return Texture offset
+		 */
+		public static function createTexture(builder:FlatBufferBuilder, 
+										textureNameOffset:*, 
+										numTextures:int, 
+										texturesOffset:*, 
+										numTest:int, 
+										numTest2:int, 
+										testAppendOffset:*):int
+		{
+			builder.startObject(7);
+			addTextureName(builder, textureNameOffset);
+			addNumTextures(builder, numTextures);
+			addTextures(builder, texturesOffset);
+			addNumTest(builder, numTest);
+			addNumTest2(builder, numTest2);
+			addTestAppend(builder, testAppendOffset);
+			var o:int = builder.endObject();
+			return o;
+		}
+
+		/**
+		 * @param FlatBufferBuilder builder
+		 * @param (if type is * means int offset value) *
+		 * @return void
+		 */
+		public static function addTextureName(builder:FlatBufferBuilder, textureNameOffset:*):void
+		{
+			builder.addOffsetX(0, textureNameOffset, 0);
+		}
+
+		/**
+		 * @param FlatBufferBuilder builder
+		 * @param (if type is * means int offset value) int
+		 * @return void
+		 */
+		public static function addNumTextures(builder:FlatBufferBuilder, numTextures:int):void
+		{
+			builder.addShortX(1, numTextures, 0);
+		}
+
+		/**
+		 * @param FlatBufferBuilder builder
+		 * @param (if type is * means int offset value) *
+		 * @return void
+		 */
+		public static function addTextures(builder:FlatBufferBuilder, texturesOffset:*):void
+		{
+			builder.addOffsetX(2, texturesOffset, 0);
+		}
+
+		/**
+		 * @param FlatBufferBuilder builder
+		 * @param array ofsset array
+		 * @return int vector offset
+		 */
+		public static function createTexturesVector(builder:FlatBufferBuilder, data:Array):int
+		{
+			builder.startVector(4, data.length, 4);
+			for(var i:int=data.length-1; i>=0; i--){
+				builder.addOffset(data[i]);
+			}
+			return builder.endVector();
+		}
+
+		/**
+		 * @param FlatBufferBuilder builder
+		 * @param int numElems
+		 * @return void
+		 */
+		public static function startTexturesVector(builder:FlatBufferBuilder, numElems:int):void
+		{
+			builder.startVector(4, numElems, 4);
+		}
+
+		/**
+		 * @param FlatBufferBuilder builder
+		 * @param (if type is * means int offset value) int
+		 * @return void
+		 */
+		public static function addNumTest(builder:FlatBufferBuilder, numTest:int):void
+		{
+			builder.addShortX(3, numTest, 30);
+		}
+
+		/**
+		 * @param FlatBufferBuilder builder
+		 * @param (if type is * means int offset value) int
+		 * @return void
+		 */
+		public static function addNumTest2(builder:FlatBufferBuilder, numTest2:int):void
+		{
+			builder.addShortX(5, numTest2, 0);
+		}
+
+		/**
+		 * @param FlatBufferBuilder builder
+		 * @param (if type is * means int offset value) int
+		 * @return void
+		 */
+		public static function addTestAppend(builder:FlatBufferBuilder, testAppendOffset:int):void
+		{
+			builder.addOffsetX(6, testAppendOffset, 0);
+		}
+
+		/**
+		 * @param FlatBufferBuilder builder
+		 * @return int table offset
+		 */
+		public static function endTexture(builder:FlatBufferBuilder):int
+		{
+			var o:int = builder.endObject();
+			return o;
+		}
+
+
+		public static function finishTextureBuffer(builder:FlatBufferBuilder, offset:int):void
+		{
+			builder.finish(offset);
+		}
+
+	}
 
 
 }

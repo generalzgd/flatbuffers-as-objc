@@ -199,36 +199,23 @@ class CppGenerator : public BaseGenerator {
       code += "); }\n\n";
     }
 
-	if(parser_.opts.generate_reflector){
-		bool bFind = false;
-		for(auto it=parser_.enums_.vec.begin(); it!=parser_.enums_.vec.end(); ++it){
-			auto &enum_def = **it;
-			if(enum_def.name == "ProtocolID"){
-				bFind = true;
-				break;
+	if(parser_.factory_enum_def_){
+		std::string enum_name = parser_.factory_enum_def_->name;
+		code += "void* "+ enum_name + "Factory(uint32_t protocolId, const void* buf){\n";
+			code += "	switch(protocolId){\n";
+			
+			for(auto it2=parser_.factory_enum_def_->vals.vec.begin(); it2 != parser_.factory_enum_def_->vals.vec.end(); ++it2){
+				auto &ev = **it2;
+				code += "		case " + NumToString(ev.value) + ":\n";
+				code += "			return Get" +MakeCamel(ev.name)+"(buf);\n";
 			}
-		}
-		if(bFind){
-			code += "auto ZhanqiProtocolFactory(uint32_t protocolID){\n";
-			code += "	switch(protocolID){\n";
-			for(auto it=parser_.enums_.vec.begin(); it!=parser_.enums_.vec.end(); ++it){
-				auto &enum_def = **it;
-				if(enum_def.name == "ProtocolID"){
-					for(auto it2=enum_def.vals.vec.begin(); it2 != enum_def.vals.vec.end(); ++it2){
-						auto &ev = **it2;
-						code += "		case " + NumToString(ev.value) + ":\n";
-						code += "			return new " +MakeCamel(ev.name)+"();break;\n";
-					}
-					break;
-				}
-			}
+					
 			code += "	}\n";
 			code += "	return nullptr;\n";
 			code += "}\n\n";
-		}
 	}
 
-    assert(cur_name_space_);
+	assert(cur_name_space_);
     SetNameSpace(nullptr, &code);
 
     // Close the include guard.

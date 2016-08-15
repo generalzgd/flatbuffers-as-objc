@@ -29,4 +29,6 @@ table Texture {
 	test_append:TestAppend;
 }
 
+factory_type Color;
+
 root_type Texture;
