@@ -243,6 +243,7 @@ inline bool VerifyAny(flatbuffers::Verifier &verifier, const void *union_obj, An
 
 
 ///powered by zgd
+///generate GetRootAs* function for each table/struct
 inline const Jason::Flat::Test::TestAppend *GetTestAppend(const void *buf) { return flatbuffers::GetRoot<Jason::Flat::Test::TestAppend>(buf); }
 
 inline TestAppend *GetMutableTestAppend(void *buf) { return flatbuffers::GetMutableRoot<TestAppend>(buf); }
@@ -259,6 +260,7 @@ inline bool VerifyTextureBuffer(flatbuffers::Verifier &verifier) { return verifi
 
 inline void FinishTextureBuffer(flatbuffers::FlatBufferBuilder &fbb, flatbuffers::Offset<Jason::Flat::Test::Texture> root) { fbb.Finish(root); }
 
+///generate reflect function for all table/struct in factory type
 void* ColorFactory(uint32_t protocolId, const void* buf){
 	switch(protocolId){
 		case 1:

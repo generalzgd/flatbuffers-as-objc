@@ -130,6 +130,7 @@ class CppGenerator : public BaseGenerator {
 
 	//为每个table/struct生成一个GetRootAs*方法
 	code += "\n///powered by zgd\n";
+	code += "///generate GetRootAs* function for each table/struct\n";
 	for (auto it = parser_.structs_.vec.begin(); it != parser_.structs_.vec.end(); ++it) {
 		auto &struct_def = **it;
 		SetNameSpace(struct_def.defined_namespace, &code);
@@ -205,18 +206,19 @@ class CppGenerator : public BaseGenerator {
 
 	if(parser_.factory_enum_def_){
 		std::string enum_name = parser_.factory_enum_def_->name;
+		code += "///generate reflect function for all table/struct in factory type\n";
 		code += "void* "+ enum_name + "Factory(uint32_t protocolId, const void* buf){\n";
-			code += "	switch(protocolId){\n";
+		code += "	switch(protocolId){\n";
 			
-			for(auto it2=parser_.factory_enum_def_->vals.vec.begin(); it2 != parser_.factory_enum_def_->vals.vec.end(); ++it2){
-				auto &ev = **it2;
-				code += "		case " + NumToString(ev.value) + ":\n";
-				code += "			return Get" +MakeCamel(ev.name)+"(buf);\n";
-			}
+		for(auto it2=parser_.factory_enum_def_->vals.vec.begin(); it2 != parser_.factory_enum_def_->vals.vec.end(); ++it2){
+			auto &ev = **it2;
+			code += "		case " + NumToString(ev.value) + ":\n";
+			code += "			return Get" +MakeCamel(ev.name)+"(buf);\n";
+		}
 					
-			code += "	}\n";
-			code += "	return nullptr;\n";
-			code += "}\n\n";
+		code += "	}\n";
+		code += "	return nullptr;\n";
+		code += "}\n\n";
 	}
 
 	assert(cur_name_space_);

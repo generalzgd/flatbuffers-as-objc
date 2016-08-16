@@ -7,7 +7,7 @@ import (
 )
 
 ///powered by zgd
-func GetProtocol(id uint, bytes []byte) unsafe.Pointer{
+func GetProtocol(id uint, bytes []byte) interface{}{
 	switch id{
 	case 1:
 		return GetRootAsRad(bytes)

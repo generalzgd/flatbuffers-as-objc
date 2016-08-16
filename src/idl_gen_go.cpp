@@ -511,7 +511,7 @@ static void GenFactory(const EnumDef &enum_def, std::string *code_ptr){
 	std::string &code = *code_ptr;
 	code += "\n///powered by zgd\n";
 
-	code += "func GetProtocol(id uint, bytes []byte) unsafe.Pointer{\n";
+	code += "func GetProtocol(id uint, bytes []byte) interface{}{\n";
 	code += "	switch id{\n";
 
 for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
