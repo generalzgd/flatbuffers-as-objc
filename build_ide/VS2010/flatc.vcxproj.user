@@ -3,7 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LocalDebuggerWorkingDirectory>..\..\tests</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-g --no-includes --gen-mutable --gen-json myTest.fbs</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-c -g --no-includes --gen-mutable --gen-json myTest.fbs</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LocalDebuggerWorkingDirectory>..\..</LocalDebuggerWorkingDirectory>

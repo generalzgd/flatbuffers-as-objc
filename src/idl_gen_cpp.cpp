@@ -59,8 +59,7 @@ class CppGenerator : public BaseGenerator {
     include_guard += "_";
     // For further uniqueness, also add the namespace.
     auto name_space = parser_.namespaces_.back();
-    for (auto it = name_space->components.begin();
-         it != name_space->components.end(); ++it) {
+    for (auto it = name_space->components.begin(); it != name_space->components.end(); ++it) {
       include_guard += *it + "_";
     }
     include_guard += "H_";
@@ -72,132 +71,137 @@ class CppGenerator : public BaseGenerator {
     code += "#include \"flatbuffers/flatbuffers.h\"\n\n";
 
     if (parser_.opts.include_dependence_headers) {
-      int num_includes = 0;
-      for (auto it = parser_.included_files_.begin();
-           it != parser_.included_files_.end(); ++it) {
-        auto basename =
-            flatbuffers::StripPath(flatbuffers::StripExtension(it->first));
-        if (basename != file_name_) {
-          code += "#include \"" + basename + "_generated.h\"\n";
-          num_includes++;
-        }
-      }
-      if (num_includes) code += "\n";
+		int num_includes = 0;
+		for (auto it = parser_.included_files_.begin(); it != parser_.included_files_.end(); ++it) {
+			auto basename = flatbuffers::StripPath(flatbuffers::StripExtension(it->first));
+			if (basename != file_name_) {
+				code += "#include \"" + basename + "_generated.h\"\n";
+				num_includes++;
+			}
+		}
+		if (num_includes) code += "\n";
     }
 
     assert(!cur_name_space_);
 
     // Generate forward declarations for all structs/tables, since they may
     // have circular references.
-    for (auto it = parser_.structs_.vec.begin();
-         it != parser_.structs_.vec.end(); ++it) {
-      auto &struct_def = **it;
-      if (!struct_def.generated) {
-        SetNameSpace(struct_def.defined_namespace, &code);
-        code += "struct " + struct_def.name + ";\n\n";
-      }
+    for (auto it = parser_.structs_.vec.begin(); it != parser_.structs_.vec.end(); ++it) {
+		auto &struct_def = **it;
+		if (!struct_def.generated) {
+			SetNameSpace(struct_def.defined_namespace, &code);
+			code += "struct " + struct_def.name + ";\n\n";
+		}
     }
 
     // Generate code for all the enum declarations.
-    for (auto it = parser_.enums_.vec.begin(); it != parser_.enums_.vec.end();
-         ++it) {
-      auto &enum_def = **it;
-      if (!enum_def.generated) {
-        SetNameSpace((**it).defined_namespace, &code);
-        GenEnum(**it, &code);
-      }
+    for (auto it = parser_.enums_.vec.begin(); it != parser_.enums_.vec.end(); ++it) {
+		auto &enum_def = **it;
+		if (!enum_def.generated) {
+			SetNameSpace((**it).defined_namespace, &code);
+			GenEnum(**it, &code);
+		}
     }
 
     // Generate code for all structs, then all tables.
-    for (auto it = parser_.structs_.vec.begin();
-         it != parser_.structs_.vec.end(); ++it) {
-      auto &struct_def = **it;
-      if (struct_def.fixed && !struct_def.generated) {
-        SetNameSpace(struct_def.defined_namespace, &code);
-        GenStruct(struct_def, &code);
-      }
+    for (auto it = parser_.structs_.vec.begin(); it != parser_.structs_.vec.end(); ++it) {
+		auto &struct_def = **it;
+		if (struct_def.fixed && !struct_def.generated) {
+			SetNameSpace(struct_def.defined_namespace, &code);
+			GenStruct(struct_def, &code);
+		}
     }
-    for (auto it = parser_.structs_.vec.begin();
-         it != parser_.structs_.vec.end(); ++it) {
-      auto &struct_def = **it;
-      if (!struct_def.fixed && !struct_def.generated) {
-        SetNameSpace(struct_def.defined_namespace, &code);
-        GenTable(struct_def, &code);
-      }
-    }
+    for (auto it = parser_.structs_.vec.begin(); it != parser_.structs_.vec.end(); ++it) {
+		auto &struct_def = **it;
+		if (!struct_def.fixed && !struct_def.generated) {
+			SetNameSpace(struct_def.defined_namespace, &code);
+			GenTable(struct_def, &code);
+		}
+	}
 
     // Generate code for union verifiers.
-    for (auto it = parser_.enums_.vec.begin(); it != parser_.enums_.vec.end();
-         ++it) {
-      auto &enum_def = **it;
-      if (enum_def.is_union && !enum_def.generated) {
-        SetNameSpace(enum_def.defined_namespace, &code);
-        GenEnumPost(enum_def, &code);
-      }
+    for (auto it = parser_.enums_.vec.begin(); it != parser_.enums_.vec.end(); ++it) {
+		auto &enum_def = **it;
+		if (enum_def.is_union && !enum_def.generated) {
+			SetNameSpace(enum_def.defined_namespace, &code);
+			GenEnumPost(enum_def, &code);
+		}
     }
+
+	//为每个table/struct生成一个GetRootAs*方法
+	code += "\n///powered by zgd\n";
+	for (auto it = parser_.structs_.vec.begin(); it != parser_.structs_.vec.end(); ++it) {
+		auto &struct_def = **it;
+		SetNameSpace(struct_def.defined_namespace, &code);
+		std::string name = struct_def.name;
+		std::string qualified_name = parser_.namespaces_.back()->GetFullyQualifiedName(name);
+		std::string cpp_qualified_name = TranslateNameSpace(qualified_name);
+
+		code += "inline const " + cpp_qualified_name + " *Get" + name + "(const void *buf) { return flatbuffers::GetRoot<" + cpp_qualified_name + ">(buf); }\n\n";
+		if (parser_.opts.mutable_buffer) {
+			code += "inline " + name + " *GetMutable" + name + "(void *buf) { return flatbuffers::GetMutableRoot<" + name + ">(buf); }\n\n";
+		}
+	}
 
     // Generate convenient global helper functions:
-    if (parser_.root_struct_def_) {
-      SetNameSpace((*parser_.root_struct_def_).defined_namespace, &code);
-      auto &name = parser_.root_struct_def_->name;
-      std::string qualified_name =
-          parser_.namespaces_.back()->GetFullyQualifiedName(name);
-      std::string cpp_qualified_name = TranslateNameSpace(qualified_name);
+	if (parser_.root_struct_def_) {
+		SetNameSpace((*parser_.root_struct_def_).defined_namespace, &code);
+		auto &name = parser_.root_struct_def_->name;
+		std::string qualified_name = parser_.namespaces_.back()->GetFullyQualifiedName(name);
+		std::string cpp_qualified_name = TranslateNameSpace(qualified_name);
 
       // The root datatype accessor:
-      code += "inline const " + cpp_qualified_name + " *Get";
-      code += name;
-      code += "(const void *buf) { return flatbuffers::GetRoot<";
-      code += cpp_qualified_name + ">(buf); }\n\n";
-      if (parser_.opts.mutable_buffer) {
-        code += "inline " + name + " *GetMutable";
-        code += name;
-        code += "(void *buf) { return flatbuffers::GetMutableRoot<";
-        code += name + ">(buf); }\n\n";
-      }
+		/*code += "inline const " + cpp_qualified_name + " *Get";
+		code += name;
+		code += "(const void *buf) { return flatbuffers::GetRoot<";
+		code += cpp_qualified_name + ">(buf); }\n\n";
+		if (parser_.opts.mutable_buffer) {
+			code += "inline " + name + " *GetMutable";
+			code += name;
+			code += "(void *buf) { return flatbuffers::GetMutableRoot<";
+			code += name + ">(buf); }\n\n";
+		}*/
 
-      if (parser_.file_identifier_.length()) {
-        // Return the identifier
-        code += "inline const char *" + name;
-        code += "Identifier() { return \"" + parser_.file_identifier_;
-        code += "\"; }\n\n";
+		if (parser_.file_identifier_.length()) {
+			// Return the identifier
+			code += "inline const char *" + name;
+			code += "Identifier() { return \"" + parser_.file_identifier_;
+			code += "\"; }\n\n";
 
-        // Check if a buffer has the identifier.
-        code += "inline bool " + name;
-        code += "BufferHasIdentifier(const void *buf) { return flatbuffers::";
-        code += "BufferHasIdentifier(buf, ";
-        code += name + "Identifier()); }\n\n";
-      }
+			// Check if a buffer has the identifier.
+			code += "inline bool " + name;
+			code += "BufferHasIdentifier(const void *buf) { return flatbuffers::";
+			code += "BufferHasIdentifier(buf, ";
+			code += name + "Identifier()); }\n\n";
+		}
 
-      // The root verifier:
-      code += "inline bool Verify";
-      code += name;
-      code +=
-          "Buffer(flatbuffers::Verifier &verifier) { "
-          "return verifier.VerifyBuffer<";
-      code += cpp_qualified_name + ">(";
-      if (parser_.file_identifier_.length())
-        code += name + "Identifier()";
-      else
-        code += "nullptr";
-      code += "); }\n\n";
+		// The root verifier:
+		code += "inline bool Verify";
+		code += name;
+		code += "Buffer(flatbuffers::Verifier &verifier) { ";
+        code += "return verifier.VerifyBuffer<";
+		code += cpp_qualified_name + ">(";
+		if (parser_.file_identifier_.length())
+			code += name + "Identifier()";
+		else
+			code += "nullptr";
+		code += "); }\n\n";
 
-      if (parser_.file_extension_.length()) {
-        // Return the extension
-        code += "inline const char *" + name;
-        code += "Extension() { return \"" + parser_.file_extension_;
-        code += "\"; }\n\n";
-      }
+		if (parser_.file_extension_.length()) {
+			// Return the extension
+			code += "inline const char *" + name;
+			code += "Extension() { return \"" + parser_.file_extension_;
+			code += "\"; }\n\n";
+		}
 
-      // Finish a buffer with a given root object:
-      code += "inline void Finish" + name;
-      code +=
-          "Buffer(flatbuffers::FlatBufferBuilder &fbb, flatbuffers::Offset<";
-      code += cpp_qualified_name + "> root) { fbb.Finish(root";
-      if (parser_.file_identifier_.length())
-        code += ", " + name + "Identifier()";
-      code += "); }\n\n";
-    }
+		// Finish a buffer with a given root object:
+		code += "inline void Finish" + name;
+		code += "Buffer(flatbuffers::FlatBufferBuilder &fbb, flatbuffers::Offset<";
+		code += cpp_qualified_name + "> root) { fbb.Finish(root";
+		if (parser_.file_identifier_.length())
+			code += ", " + name + "Identifier()";
+		code += "); }\n\n";
+	}
 
 	if(parser_.factory_enum_def_){
 		std::string enum_name = parser_.factory_enum_def_->name;

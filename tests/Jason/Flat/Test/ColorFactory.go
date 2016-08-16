@@ -5,8 +5,9 @@ package Test
 import (
 	flatbuffers "github.com/google/flatbuffers/go"
 )
+
 ///powered by zgd
-func GetProtocol(id uint, bytes []byte) interface{}{
+func GetProtocol(id uint, bytes []byte) unsafe.Pointer{
 	switch id{
 	case 1:
 		return GetRootAsRad(bytes)

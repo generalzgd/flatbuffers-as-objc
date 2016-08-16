@@ -241,6 +241,16 @@ inline bool VerifyAny(flatbuffers::Verifier &verifier, const void *union_obj, An
   }
 }
 
+
+///powered by zgd
+inline const Jason::Flat::Test::TestAppend *GetTestAppend(const void *buf) { return flatbuffers::GetRoot<Jason::Flat::Test::TestAppend>(buf); }
+
+inline TestAppend *GetMutableTestAppend(void *buf) { return flatbuffers::GetMutableRoot<TestAppend>(buf); }
+
+inline const Jason::Flat::Test::TextureData *GetTextureData(const void *buf) { return flatbuffers::GetRoot<Jason::Flat::Test::TextureData>(buf); }
+
+inline TextureData *GetMutableTextureData(void *buf) { return flatbuffers::GetMutableRoot<TextureData>(buf); }
+
 inline const Jason::Flat::Test::Texture *GetTexture(const void *buf) { return flatbuffers::GetRoot<Jason::Flat::Test::Texture>(buf); }
 
 inline Texture *GetMutableTexture(void *buf) { return flatbuffers::GetMutableRoot<Texture>(buf); }
