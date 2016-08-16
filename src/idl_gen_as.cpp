@@ -676,41 +676,6 @@ namespace as3{
 			GetEndOffsetOnTable(struct_def, code_ptr);
 		}
 
-		void GenFactoryFun(std::string *code_ptr){
-			std::string &code = *code_ptr;
-
-			bool finded = false;
-			for(auto it=parser_.enums_.vec.begin(); it!=parser_.enums_.vec.end(); it++){
-				auto &enum_def = **it;
-				if(enum_def.name == "ProtocolID"){
-					finded = true;
-					break;
-				}
-			}
-			if(!finded)return;
-			
-			code += Indent + Indent + "/**\n";
-			code += Indent + Indent + " * get struct class by enum protocol id\n";
-			code += Indent + Indent + " */\n";
-			code += Indent + Indent + "public static function getProtocol(protocolID:uint, bytes:ByteArray):*\n";
-			code += Indent + Indent + "{\n";
-			code += Indent + Indent + Indent + "switch(protocolID)\n";
-			code += Indent + Indent + Indent + "{\n";
-			for(auto it=parser_.enums_.vec.begin(); it!=parser_.enums_.vec.end(); ++it){
-				auto &enum_def = **it;
-				if(enum_def.name == "ProtocolID"){
-					for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
-						auto &ev = **it;
-						code += Indent + Indent + Indent + Indent + "case " + NumToString(ev.value) +":\n";
-						code += Indent + Indent + Indent + Indent + Indent + "return " + FullNamespace(".", *enum_def.defined_namespace)+"."+MakeCamel(ev.name)+".getRootAs"+MakeCamel(ev.name)+"(bytes);\n";
-					}
-					break;
-				}
-			}
-			code += Indent + Indent + Indent + "}\n";
-			code += Indent + Indent + Indent + "return null;\n";
-			code += Indent + Indent + "}\n\n";
-		}
 
 		void GenFactory(const EnumDef &enum_def, std::string *code_ptr){
 			std::string &code = *code_ptr;

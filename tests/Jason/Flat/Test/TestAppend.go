@@ -10,6 +10,13 @@ type TestAppend struct {
 	_tab flatbuffers.Table
 }
 
+func GetRootAsTestAppend(buf []byte, offset flatbuffers.UOffsetT) *TestAppend {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &TestAppend{}
+	x.Init(buf, n + offset)
+	return x
+}
+
 func (rcv *TestAppend) Init(buf []byte, i flatbuffers.UOffsetT) {
 	rcv._tab.Bytes = buf
 	rcv._tab.Pos = i

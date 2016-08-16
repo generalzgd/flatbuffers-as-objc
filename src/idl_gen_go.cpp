@@ -507,6 +507,28 @@ static void GenTableBuilders(const StructDef &struct_def,
   GetEndOffsetOnTable(struct_def, code_ptr);
 }
 
+static void GenFactory(const EnumDef &enum_def, std::string *code_ptr){
+	std::string &code = *code_ptr;
+	code += "\n///powered by zgd\n";
+
+	code += "func GetProtocol(id uint, bytes []byte) interface{}{\n";
+	code += "	switch id{\n";
+
+for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
+	auto &ev = **it;
+	code += "	case " + NumToString(ev.value) +":\n";
+	code += "		return GetRootAs"+MakeCamel(ev.name)+"(bytes)\n";
+}
+	code += "	default:\n";
+	code += "		return nil\n";
+	code += "	}\n";
+	code += "	return nil\n";
+	code += "}\n";
+
+}
+
+
+
 // Generate struct or table methods.
 static void GenStruct(const StructDef &struct_def,
                       std::string *code_ptr,
@@ -515,17 +537,15 @@ static void GenStruct(const StructDef &struct_def,
 
   GenComment(struct_def.doc_comment, code_ptr, nullptr);
   BeginClass(struct_def, code_ptr);
-  if (&struct_def == root_struct_def) {
+  //if (&struct_def == root_struct_def) {
     // Generate a special accessor for the table that has been declared as
     // the root type.
     NewRootTypeFromBuffer(struct_def, code_ptr);
-  }
+  //}
   // Generate the Init method that sets the field in a pre-existing
   // accessor object. This is to allow object reuse.
   InitializeExisting(struct_def, code_ptr);
-  for (auto it = struct_def.fields.vec.begin();
-       it != struct_def.fields.vec.end();
-       ++it) {
+  for (auto it = struct_def.fields.vec.begin(); it != struct_def.fields.vec.end(); ++it) {
     auto &field = **it;
     if (field.deprecated) continue;
 
@@ -633,10 +653,16 @@ class GoGenerator : public BaseGenerator {
       std::string enumcode;
       go::GenEnum(**it, &enumcode);
       if (!SaveType(**it, enumcode, false)) return false;
+
+	  auto &enum_def = **it;
+	  if(parser_.factory_enum_def_ == &enum_def){
+		  std::string enumcode;
+		  GenFactory(**it, &enumcode);
+		  if (!SaveFactoryType(**it, enumcode, true)) return false;
+	  }
     }
 
-    for (auto it = parser_.structs_.vec.begin();
-         it != parser_.structs_.vec.end(); ++it) {
+    for (auto it = parser_.structs_.vec.begin(); it != parser_.structs_.vec.end(); ++it) {
       std::string declcode;
       go::GenStruct(**it, &declcode, parser_.root_struct_def_);
       if (!SaveType(**it, declcode, true)) return false;
@@ -658,10 +684,21 @@ class GoGenerator : public BaseGenerator {
       code += ")\n";
     }
   }
+  
+  // Save out the generated code for a Go Table type.
+  bool SaveFactoryType(const Definition &def, const std::string &classcode, bool needs_imports) {
+    if (!classcode.length()) return true;
+
+    std::string code = "";
+    BeginFile(LastNamespacePart(*def.defined_namespace), needs_imports, &code);
+    code += classcode;
+    std::string filename =
+        NamespaceDir(*def.defined_namespace) + def.name + "Factory.go";
+    return SaveFile(filename.c_str(), code, false);
+  }
 
   // Save out the generated code for a Go Table type.
-  bool SaveType(const Definition &def, const std::string &classcode,
-                bool needs_imports) {
+  bool SaveType(const Definition &def, const std::string &classcode, bool needs_imports) {
     if (!classcode.length()) return true;
 
     std::string code = "";

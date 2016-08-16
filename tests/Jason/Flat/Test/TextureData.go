@@ -10,6 +10,13 @@ type TextureData struct {
 	_tab flatbuffers.Table
 }
 
+func GetRootAsTextureData(buf []byte, offset flatbuffers.UOffsetT) *TextureData {
+	n := flatbuffers.GetUOffsetT(buf[offset:])
+	x := &TextureData{}
+	x.Init(buf, n + offset)
+	return x
+}
+
 func (rcv *TextureData) Init(buf []byte, i flatbuffers.UOffsetT) {
 	rcv._tab.Bytes = buf
 	rcv._tab.Pos = i

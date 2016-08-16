@@ -29,6 +29,7 @@ table Texture {
 	test_append:TestAppend;
 }
 
+///工厂类
 factory_type Color;
 
 root_type Texture;

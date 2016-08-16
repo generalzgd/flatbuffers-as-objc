@@ -782,7 +782,7 @@ namespace php {
 		code += Indent + "/**\n";
 		code += Indent + " * get struct class by enum protocol id\n";
 		code += Indent + " */\n";
-		code += Indent + "public static function getProtocol($protocolId, ByteBuffer $bb):*\n";
+		code += Indent + "public static function getProtocol($protocolId, ByteBuffer $bb)\n";
 		code += Indent + "{\n";
 		code += Indent + Indent + "switch($protocolId)\n";
 		code += Indent + Indent + "{\n";
