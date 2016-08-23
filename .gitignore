@@ -6,7 +6,10 @@
 *.class
 *.a
 *~
+*.vcxproj
 *.vcxproj.filters
+*.vcxproj.user
+*.sln
 *.suo
 *.keystore
 **/bin/**
@@ -37,6 +40,8 @@ flatsamplebinary
 flatsamplebinary.exe
 flatsampletext
 flatsampletext.exe
+grpctest
+grpctest.exe
 snapshot.sh
 tests/go_gen
 tests/monsterdata_java_wire.mon

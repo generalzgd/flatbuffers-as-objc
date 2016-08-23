@@ -727,8 +727,8 @@ offsets.
   // Place the two weapons into an array, and pass it to the `createWeaponsVector()` method to
   // create a FlatBuffer vector.
   int[] weaps = new int[2];
-  weaps[1] = sword;
-  weaps[2] = axe;
+  weaps[0] = sword;
+  weaps[1] = axe;
 
   // Pass the `weaps` array into the `createWeaponsVector()` method to create a FlatBuffer vector.
   int weapons = Monster.createWeaponsVector(builder, weaps);
@@ -1161,12 +1161,23 @@ like so:
 ~~~{.java}
   // This must be called after `finish()`.
   java.nio.ByteBuffer buf = builder.dataBuffer();
+  // The data in this ByteBuffer does NOT start at 0, but at buf.position().
+  // The number of bytes is buf.remaining().
+
+  // Alternatively this copies the above data out of the ByteBuffer for you:
+  bytes[] buf = builder.sizedByteArray();
 ~~~
 </div>
 <div class="language-csharp">
 ~~~{.cs}
   // This must be called after `Finish()`.
   var buf = builder.DataBuffer; // Of type `FlatBuffers.ByteBuffer`.
+  // The data in this ByteBuffer does NOT start at 0, but at buf.Position.
+  // The end of the data is marked by buf.Length, so the size is
+  // buf.Length - buf.Position.
+
+  // Alternatively this copies the above data out of the ByteBuffer for you:
+  bytes[] buf = builder.SizedByteArray();
 ~~~
 </div>
 <div class="language-go">
@@ -1184,13 +1195,16 @@ like so:
 <div class="language-javascript">
 ~~~{.js}
   // This must be called after `finish()`.
-  var buf = builder.dataBuffer(); // Of type `flatbuffers.ByteBuffer`.
+  var buf = builder.asUint8Array(); // Of type `Uint8Array`.
 ~~~
 </div>
 <div class="language-php">
 ~~~{.php}
   // This must be called after `finish()`.
   $buf = $builder->dataBuffer(); // Of type `Google\FlatBuffers\ByteBuffer`
+  // The data in this ByteBuffer does NOT start at 0, but at buf->getPosition().
+  // The end of the data is marked by buf->capacity(), so the size is
+  // buf->capacity() - buf->getPosition().
 ~~~
 </div>
 <div class="language-c">
@@ -1881,6 +1895,9 @@ One way to solve this is to call `ForceDefaults` on a FlatBufferBuilder to
 force all fields you set to actually be written. This, of course, increases the
 size of the buffer somewhat, but this may be acceptable for a mutable buffer.
 
+If this is not sufficient, other ways of mutating FlatBuffers may be supported
+in your language through an object based API (`--gen-object-api`) or reflection.
+See the individual language documents for support.
 
 ## JSON with FlatBuffers
 
