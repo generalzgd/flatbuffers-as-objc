@@ -369,7 +369,7 @@ struct IDLOptions {
       skip_unexpected_fields_in_json(false),
       generate_name_strings(false),
       escape_proto_identifiers(false),
-	  generate_object_based_api(false),
+	  //generate_object_based_api(false),
       union_value_namespacing(true),
       allow_non_utf8(false),
       lang(IDLOptions::kJava),

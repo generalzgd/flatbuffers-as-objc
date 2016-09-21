@@ -272,7 +272,7 @@ static void GenStruct(const StructDef &struct_def, const Table *table,
 }
 
 // Generate a text representation of a flatbuffer in JSON format.
-void GenerateText(const Parser &parser, const void *flatbuffer,
+bool GenerateText(const Parser &parser, const void *flatbuffer,
                   std::string *_text) {
   std::string &text = *_text;
   assert(parser.root_struct_def_);  // call SetRootType()
@@ -283,6 +283,7 @@ void GenerateText(const Parser &parser, const void *flatbuffer,
             parser.opts,
             _text);
   text += NewLine(parser.opts);
+  return true;
 }
 
 std::string TextFileName(const std::string &path,
