@@ -263,9 +263,9 @@ inline void FinishTextureBuffer(flatbuffers::FlatBufferBuilder &fbb, flatbuffers
 ///generate reflect function for all table/struct in factory type
 void* ColorFactory(uint32_t protocolId, const void* buf){
 	switch(protocolId){
-		case 1: return (void*)GetMutableRad(buf);
-		case 2: return (void*)GetMutableGreen(buf);
-		case 3: return (void*)GetMutableBlue(buf);
+		case 1: return (void*)GetRad(buf);
+		case 2: return (void*)GetGreen(buf);
+		case 3: return (void*)GetBlue(buf);
 	}
 	return nullptr;
 }

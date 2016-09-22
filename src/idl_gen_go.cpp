@@ -516,11 +516,11 @@ static void GenFactory(const EnumDef &enum_def, std::string *code_ptr){
 
 for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
 	auto &ev = **it;
-	code += "	case " + NumToString(ev.value) +":\n";
-	code += "		return GetRootAs"+MakeCamel(ev.name)+"(bytes)\n";
+	code += "	case " + NumToString(ev.value) +":";
+	code += " return GetRootAs"+MakeCamel(ev.name)+"(bytes, 0)\n";
 }
-	code += "	default:\n";
-	code += "		return nil\n";
+	code += "	default:";
+	code += " return nil\n";
 	code += "	}\n";
 	code += "	return nil\n";
 	code += "}\n";
@@ -658,7 +658,7 @@ class GoGenerator : public BaseGenerator {
 	  if(parser_.factory_enum_def_ == &enum_def){
 		  std::string enumcode;
 		  GenFactory(**it, &enumcode);
-		  if (!SaveFactoryType(**it, enumcode, true)) return false;
+		  if (!SaveFactoryType(**it, enumcode, false)) return false;
 	  }
     }
 

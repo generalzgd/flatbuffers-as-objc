@@ -2,21 +2,14 @@
 
 package Test
 
-import (
-	flatbuffers "github.com/google/flatbuffers/go"
-)
 
 ///powered by zgd
 func GetProtocol(id uint, bytes []byte) interface{}{
 	switch id{
-	case 1:
-		return GetRootAsRad(bytes)
-	case 2:
-		return GetRootAsGreen(bytes)
-	case 3:
-		return GetRootAsBlue(bytes)
-	default:
-		return nil
+	case 1: return GetRootAsRad(bytes, 0)
+	case 2: return GetRootAsGreen(bytes, 0)
+	case 3: return GetRootAsBlue(bytes, 0)
+	default: return nil
 	}
 	return nil
 }
