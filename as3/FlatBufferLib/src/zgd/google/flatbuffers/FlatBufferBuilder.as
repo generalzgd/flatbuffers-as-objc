@@ -593,14 +593,25 @@ package zgd.google.flatbuffers
 			return endVector();
 		}
 		
-		/*public function createVector(elem_size:int, data:Array):int
+		public function createByteVector(byte:ByteArray):int
+		{
+			notNested()
+			
+			var len:uint = byte.length;
+			startVector(1, length, 1);
+			space -= len;
+			bb.putBytes(space, byte);
+			return endVector();
+		}
+		
+		public function createVector(elem_size:int, data:Array):int
 		{
 			startVector(elem_size, data.length, minalign);
 			for(var i:int=0; i<data.length;++i)
 			{
 				
 			}
-		}*/
+		}
 		
 		public function notNested():void
 		{

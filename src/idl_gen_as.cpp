@@ -314,7 +314,7 @@ namespace as3{
 			code += Indent + Indent + " * @return " + GenTypeBasic(field.value.type) + "\n";
 			code += Indent + Indent + " */\n";
 
-			code += Indent + Indent + "public function get" + MakeCamel(field.name) + "(j:int):*\n";
+			code += Indent + Indent + "public function get" + MakeCamel(field.name) + "(j:int):"+MakeCamel(GenTypeGet(field.value.type))+"\n";
 			code += Indent + Indent + "{\n";
 			code += Indent + Indent + Indent + "var o:int = this.__offset("+NumToString(field.value.offset)+");\n";
 			code += Indent + Indent + Indent + "var obj:"+MakeCamel(GenTypeGet(field.value.type))+" = new " + MakeCamel(GenTypeGet(field.value.type)) + "();\n";
@@ -363,7 +363,7 @@ namespace as3{
 			code += Indent + Indent + " * @return " + GenTypeGet(field.value.type) + "\n";
 			code += Indent + Indent + " */\n";
 
-			code += Indent + Indent + "public function get"+MakeCamel(field.name) + "(j:int):*\n";
+			code += Indent + Indent + "public function get"+MakeCamel(field.name) + "(j:int):"+GenTypeGet(field.value.type)+"\n";
 			code += Indent + Indent + "{\n";
 			code += Indent + Indent + Indent + "var o:int = this.__offset("+NumToString(field.value.offset) + ");\n";
 			if(field.value.type.VectorType().base_type == BASE_TYPE_STRING){
@@ -371,6 +371,26 @@ namespace as3{
 			}else{
 				code += Indent + Indent + Indent + "return o!=0?this.bb.get"+MakeCamel(GenTypeGetForMethod(field.value.type))+"(this.__vector(o) + j * "+NumToString(InlineSize(vectortype))+"):"+GenDefaultValue(field.value)+";\n";
 			}
+			code += Indent + Indent + "}\n\n";
+		}
+
+		void GetMemberOfVector(const FieldDef &field, std::string *code_ptr){
+			std::string &code = *code_ptr;
+			auto vectortype = field.value.type.VectorType();
+
+			code += Indent + Indent + "/**\n";
+			code += Indent + Indent + " * @return \n";
+			code += Indent + Indent + " */\n";
+
+			code += Indent + Indent + "public function get"+MakeCamel(field.name)+"Vector():Array\n";
+			code += Indent + Indent + "{\n";
+			code += Indent + Indent + Indent + "var arr:Array = new Array();\n";
+			code += Indent + Indent + Indent + "var len:int = this.get"+MakeCamel(field.name)+"Length();\n";
+			code += Indent + Indent + Indent + "for(var i:int=0; i<len; ++i)\n";
+			code += Indent + Indent + Indent + "{\n";
+			code += Indent + Indent + Indent + Indent + "arr.push( this.get"+MakeCamel(field.name)+"(i) );\n";
+			code += Indent + Indent + Indent + "}\n";
+			code += Indent + Indent + Indent + "return arr;\n";
 			code += Indent + Indent + "}\n\n";
 		}
 
@@ -585,6 +605,7 @@ namespace as3{
 				if(field.value.type.element == BASE_TYPE_UCHAR){
 					GetUByte(field, code_ptr);
 				}
+				GetMemberOfVector(field, code_ptr);
 			}
 		}
 
