@@ -180,7 +180,7 @@ LanguageParameters language_parameters[] = {
       nullptr,
       "///",
       nullptr,
-    },
+    }
   }
 };
 

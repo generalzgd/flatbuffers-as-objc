@@ -351,7 +351,7 @@ struct IDLOptions {
   bool allow_non_utf8;
   
   // Possible options for the more general generator below.
-  enum Language { kJava, kCSharp, kGo,  kMAX };
+  enum Language { kJava, kCSharp, kGo,  kMAX , kAs};
 
   Language lang;
 

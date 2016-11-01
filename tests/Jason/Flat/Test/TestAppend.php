@@ -52,6 +52,17 @@ class TestAppend extends Table
     }
 
     /**
+     * change to json object
+     */
+    public function toJson()
+    {
+        $o = new array();
+        $o['test_num'] = $this->getTestNum();
+        $o['test_num2'] = $this->getTestNum2();
+        return $o;
+    }
+
+    /**
      * @param FlatBufferBuilder $builder
      * @return void
      */

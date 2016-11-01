@@ -13,7 +13,9 @@ package Jason.Flat.Test
 	import flash.utils.ByteArray;
 
 
-	///文理数据结构
+	/**
+	 * 文理数据结构
+	 */
 	public class TextureData extends Table
 	{
 		/**
@@ -53,7 +55,7 @@ package Jason.Flat.Test
 		 * @param int offset
 		 * @return int
 		 */
-		public function getImageData(j:int):*
+		public function getImageData(j:int):int
 		{
 			var o:int = this.__offset(6);
 			return o!=0?this.bb.getUbyte(this.__vector(o) + j * 1):0;
@@ -74,6 +76,20 @@ package Jason.Flat.Test
 		public function getImageDataBytes():ByteArray
 		{
 			return this.__vector_as_bytes(6);
+		}
+
+		/**
+		 * @return Array
+		 */
+		public function getImageDataVector():Array
+		{
+			var arr:Array = new Array();
+			var len:int = this.getImageDataLength();
+			for(var i:int=0; i<len; ++i)
+			{
+				arr.push( this.getImageData(i) );
+			}
+			return arr;
 		}
 
 		/**

@@ -22,12 +22,9 @@ package Jason.Flat.Test
 		{
 			switch(protocolId)
 			{
-				case 1:
-					return Jason.Flat.Test.Rad.getRootAsRad(bytes);
-				case 2:
-					return Jason.Flat.Test.Green.getRootAsGreen(bytes);
-				case 3:
-					return Jason.Flat.Test.Blue.getRootAsBlue(bytes);
+				case 1:return Jason.Flat.Test.Rad.getRootAsRad(bytes);
+				case 2:return Jason.Flat.Test.Green.getRootAsGreen(bytes);
+				case 3:return Jason.Flat.Test.Blue.getRootAsBlue(bytes);
 			}
 			return null;
 		}

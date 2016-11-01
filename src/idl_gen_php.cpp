@@ -446,6 +446,26 @@ namespace php {
       code += Indent + "}\n\n";
     }
 
+	void GetMemberOfVector(const FieldDef &field, std::string *code_ptr){
+		std::string &code = *code_ptr;
+		auto vectortype = field.value.type.VectorType();
+
+		code += Indent + "/**\n";
+		code += Indent + " * @param Array\n";
+		code += Indent + " */\n";
+
+		code += Indent + "public function get"+MakeCamel(field.name)+"Vector()\n";
+		code += Indent + "{\n";
+		code += Indent + Indent + "$arr = new array();\n";
+		code += Indent + Indent + "$len = $this->get"+MakeCamel(field.name)+"Length();\n";
+		code += Indent + Indent + "for($i=0; i<$len; $i++)\n";
+		code += Indent + Indent + "{\n";
+		code += Indent + Indent + Indent + "array_push($arr, $this->get"+MakeCamel(field.name)+"(i) );\n";
+		code += Indent + Indent + "}\n";
+		code += Indent + Indent + "return $arr;\n";
+		code += Indent + "}\n\n";
+	}
+
     // Recursively generate arguments for a constructor, to deal with nested
     // structs.
     static void StructBuilderArgs(const StructDef &struct_def,
@@ -740,8 +760,60 @@ namespace php {
         if (field.value.type.element == BASE_TYPE_UCHAR) {
           GetUByte(field, code_ptr);
         }
+		GetMemberOfVector(field, code_ptr);
       }
     }
+
+	void GenJsonBuilder(const StructDef &struct_def, std::string *code_ptr){
+		std::string &code = *code_ptr;
+		code += Indent + "/**\n";
+		code += Indent + " * change to json object\n";
+		code += Indent + " */\n";
+		code += Indent + "public function toJson()\n";
+		code += Indent + "{\n";
+		code += Indent + Indent + "$o = new array();\n";
+			
+		for(auto it = struct_def.fields.vec.begin(); it!=struct_def.fields.vec.end(); ++it){
+			auto &field = **it;
+			if(!field.deprecated){
+
+				if(IsScalar(field.value.type.base_type)){
+					code += Indent + Indent + "$o['" + field.name + "'] = $this->get" + MakeCamel(field.name) + "();\n";
+				}else if(field.value.type.base_type == BASE_TYPE_STRING){
+					code += Indent + Indent + "$o['" + field.name + "'] = $this->get" + MakeCamel(field.name) + "();\n";
+				}else if(field.value.type.base_type == BASE_TYPE_VECTOR){
+					GenVectorJson(struct_def, field, code_ptr);
+				}else{
+					code += Indent + Indent + "$o['" + field.name + "'] = $this->get" + MakeCamel(field.name) + "().toJson();\n";
+				}
+			}else{
+				code += Indent + Indent + "$o['" + field.name + "'] = " + (field.value.type.base_type==BASE_TYPE_BOOL?"false":field.value.constant)+";\n";
+			}
+		}
+
+		code += Indent + Indent + "return $o;\n";
+		code += Indent + "}\n\n";
+	}
+
+	void GenVectorJson(const StructDef &struct_def, const FieldDef &field, std::string* code_ptr){
+		std::string &code = *code_ptr;
+
+		auto vector_type = field.value.type.VectorType();
+
+		code += Indent + Indent + "$arr = new array();\n";
+		code += Indent + Indent + "$len = $this->get"+MakeCamel(field.name)+"Length();\n";
+		code += Indent + Indent + "for($i=0; $i<$len; $i++)\n";
+		code += Indent + Indent + "{\n";
+		code += Indent + Indent + Indent + "$e = $this->get"+MakeCamel(field.name)+"($i);\n";
+		if(vector_type.base_type == BASE_TYPE_STRUCT){
+			code += Indent + Indent + Indent + "array_push($arr, $e.toJson() );\n";
+		}else{
+			code += Indent + Indent + Indent + "array_push($arr, $e );\n";
+		}
+		code += Indent + Indent + "}\n";
+
+		code += Indent + Indent + "$o['"+field.name+"'] = $arr;\n";
+	}
 
     // Generate table constructors, conditioned on its members' types.
     void GenTableBuilders(const StructDef &struct_def, std::string *code_ptr) {
@@ -789,8 +861,8 @@ namespace php {
 			
 		for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
 			auto &ev = **it;
-		code += Indent + Indent + Indent + "case " + NumToString(ev.value) +":\n";
-		code += Indent + Indent + Indent + Indent + "return " + FullNamespace(".", *enum_def.defined_namespace)+"."+MakeCamel(ev.name)+".getRootAs"+MakeCamel(ev.name)+"($bb);\n";
+		code += Indent + Indent + Indent + "case " + NumToString(ev.value) +":";
+		code += "return " + FullNamespace(".", *enum_def.defined_namespace)+"."+MakeCamel(ev.name)+".getRootAs"+MakeCamel(ev.name)+"($bb);\n";
 		}
 		
 		code += Indent + Indent + "}\n";
@@ -861,6 +933,10 @@ namespace php {
 
         GenStructAccessor(struct_def, field, code_ptr);
       }
+
+	  if(parser_.opts.generate_json){
+		  GenJsonBuilder(struct_def, code_ptr);
+	  }
 
       if (struct_def.fixed) {
         // create a struct constructor function

@@ -68,6 +68,20 @@ class Texture extends Table
     }
 
     /**
+     * @param Array
+     */
+    public function getTexturesVector()
+    {
+        $arr = new array();
+        $len = $this->getTexturesLength();
+        for($i=0; i<$len; $i++)
+        {
+            array_push($arr, $this->getTextures(i) );
+        }
+        return $arr;
+    }
+
+    /**
      * @return short
      */
     public function getNumTest()
@@ -90,6 +104,29 @@ class Texture extends Table
         $obj = new TestAppend();
         $o = $this->__offset(16);
         return $o != 0 ? $obj->init($this->__indirect($o + $this->bb_pos), $this->bb) : 0;
+    }
+
+    /**
+     * change to json object
+     */
+    public function toJson()
+    {
+        $o = new array();
+        $o['texture_name'] = $this->getTextureName();
+        $o['num_textures'] = $this->getNumTextures();
+        $arr = new array();
+        $len = $this->getTexturesLength();
+        for($i=0; i<$len; $i++)
+        {
+            $e = $this->getTextures(i);
+            array_push($arr, $e.toJson() );
+        }
+        $o['textures'] = $arr;
+        $o['num_test'] = $this->getNumTest();
+        $o['num_test1'] = 0;
+        $o['num_test2'] = $this->getNumTest2();
+        $o['test_append'] = $this->getTestAppend().toJson();
+        return $o;
     }
 
     /**

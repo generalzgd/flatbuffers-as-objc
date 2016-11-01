@@ -13,7 +13,9 @@ package Jason.Flat.Test
 	import flash.utils.ByteArray;
 
 
-	///testAppend注释
+	/**
+	 * testAppend注释
+	 */
 	public class TestAppend extends Table
 	{
 		/**

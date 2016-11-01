@@ -13,7 +13,9 @@ package Jason.Flat.Test
 	import flash.utils.ByteArray;
 
 
-	///文理结构
+	/**
+	 * 文理结构
+	 */
 	public class Texture extends Table
 	{
 		/**
@@ -59,9 +61,9 @@ package Jason.Flat.Test
 		}
 
 		/**
-		 * @return *
+		 * @return TextureData
 		 */
-		public function getTextures(j:int):*
+		public function getTextures(j:int):TextureData
 		{
 			var o:int = this.__offset(8);
 			var obj:TextureData = new TextureData();
@@ -75,6 +77,20 @@ package Jason.Flat.Test
 		{
 			var o:int = this.__offset(8);
 			return o!=0?this.__vector_len(o):0;
+		}
+
+		/**
+		 * @return Array
+		 */
+		public function getTexturesVector():Array
+		{
+			var arr:Array = new Array();
+			var len:int = this.getTexturesLength();
+			for(var i:int=0; i<len; ++i)
+			{
+				arr.push( this.getTextures(i) );
+			}
+			return arr;
 		}
 
 		/**

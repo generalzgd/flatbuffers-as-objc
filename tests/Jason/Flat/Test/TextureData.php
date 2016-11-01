@@ -70,6 +70,20 @@ class TextureData extends Table
     }
 
     /**
+     * @param Array
+     */
+    public function getImageDataVector()
+    {
+        $arr = new array();
+        $len = $this->getImageDataLength();
+        for($i=0; i<$len; $i++)
+        {
+            array_push($arr, $this->getImageData(i) );
+        }
+        return $arr;
+    }
+
+    /**
      * @return int
      */
     public function getTestNum2()
@@ -85,6 +99,26 @@ class TextureData extends Table
     {
         $o = $this->__offset(10);
         return $o != 0 ? $this->bb->getShort($o + $this->bb_pos) : 0;
+    }
+
+    /**
+     * change to json object
+     */
+    public function toJson()
+    {
+        $o = new array();
+        $o['image_size'] = $this->getImageSize();
+        $arr = new array();
+        $len = $this->getImageDataLength();
+        for($i=0; i<$len; $i++)
+        {
+            $e = $this->getImageData(i);
+            array_push($arr, $e );
+        }
+        $o['image_data'] = $arr;
+        $o['test_num2'] = $this->getTestNum2();
+        $o['image_test'] = $this->getImageTest();
+        return $o;
     }
 
     /**

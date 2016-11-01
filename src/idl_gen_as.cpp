@@ -17,14 +17,28 @@ namespace flatbuffers {
 
 namespace as3{
 
+	struct AsCommentConfig {
+		char *first_line;
+		char *content_line_prefix;
+		char *last_line;
+	};
+
 	//Ëõ½ø
 	const std::string Indent = "	";
 
+	AsCommentConfig *config;
+	
 	class As3Generator : public BaseGenerator {
 	public:
 		As3Generator(const Parser &parser, const std::string &path, 
 					const std::string &file_name)
 			:BaseGenerator(parser, path, file_name, "", "."){
+
+			config = new AsCommentConfig();
+			config->first_line = "/**";
+			config->content_line_prefix = " * ";
+			config->last_line = " */";
+
 			assert(1);
 		};
 
@@ -118,8 +132,57 @@ namespace as3{
 			return SaveFile(filename.c_str(), code, false);
 		}
 
-		static void BeginClass(const StructDef &struct_def, std::string *code_ptr){
+		// Generate a documentation comment, if available.
+		static void GenClassComment(const std::vector<std::string> &dc, std::string *code_ptr) {
+			if (dc.begin() == dc.end()) {
+				// Don't output empty comment blocks with 0 lines of comment content.
+				return;
+			}
+
+			
+
 			std::string &code = *code_ptr;
+
+			if (config != nullptr && config->first_line != nullptr) {
+				code += Indent + std::string(config->first_line) + "\n";
+			}
+				
+			for (auto it = dc.begin();it != dc.end();++it) {
+				code += Indent + std::string(config->content_line_prefix) + *it + "\n";
+			}
+			
+			code += Indent + std::string(config->last_line) + "\n";
+		}
+
+		static void GenAccessorComment(const std::vector<std::string> &dc, const std::vector<std::string> &dc2, std::string *code_ptr){
+			if(dc.begin() == dc.end() && dc2.begin() == dc2.end()){
+				return;
+			}
+			std::vector<std::string> list;
+			for(auto it=dc.begin();it!=dc.end();++it){
+				list.push_back(*it);
+			}
+			for(auto it=dc2.begin();it!=dc2.end();++it){
+				list.push_back(*it);
+			}
+			std::string &code = *code_ptr;
+
+			if (config != nullptr && config->first_line != nullptr) {
+				code += Indent + Indent + std::string(config->first_line) + "\n";
+			}
+
+			for (auto it = list.begin();it != list.end();++it) {
+				code += Indent + Indent + std::string(config->content_line_prefix) + *it + "\n";
+			}
+
+			code += Indent + Indent + std::string(config->last_line) + "\n";
+		}
+
+		static void BeginClass(const StructDef &struct_def, std::string *code_ptr, const std::vector<std::string> &dc){
+			std::string &code = *code_ptr;
+
+			GenClassComment(dc, code_ptr);
+
 			if(struct_def.fixed){
 				code += Indent + "public class " + struct_def.name + " extends Struct\n";
 			}else{
@@ -186,9 +249,9 @@ namespace as3{
 		static void GetVectorLen(const FieldDef &field, std::string *code_ptr){
 			std::string &code = *code_ptr;
 
-			code += Indent + Indent + "/**\n";
-			code += Indent + Indent + " * @return int\n";
-			code += Indent + Indent + " */\n";
+			std::vector<std::string> li;
+			li.push_back("@return int");
+			GenAccessorComment(field.doc_comment, li, code_ptr);
 
 			code += Indent + Indent + "public function get"+MakeCamel(field.name)+"Length():int\n";
 			code += Indent + Indent + "{\n";
@@ -201,9 +264,9 @@ namespace as3{
 		static void GetUByte(const FieldDef &field, std::string *code_ptr){
 			std::string &code = *code_ptr;
 
-			code += Indent + Indent + "/**\n";
-			code += Indent + Indent + " * @return ByteArray\n";
-			code += Indent + Indent + " */\n";
+			std::vector<std::string> li;
+			li.push_back("@return ByteArray");
+			GenAccessorComment(field.doc_comment, li, code_ptr);
 
 			code += Indent + Indent + "public function get" + MakeCamel(field.name) + "Bytes():ByteArray\n";
 			code += Indent + Indent + "{\n";
@@ -215,9 +278,9 @@ namespace as3{
 			std::string &code = *code_ptr;
 			std::string getter = GenGetter(field.value.type);
 
-			code += Indent + Indent + "/**\n";
-			code += Indent + Indent + " * @return " + GenTypeGet(field.value.type)+"\n";
-			code += Indent + Indent + " */\n";
+			std::vector<std::string> li;
+			li.push_back("@return " + GenTypeGet(field.value.type));
+			GenAccessorComment(field.doc_comment, li, code_ptr);
 
 			code += Indent + Indent + "public function " + getter + MakeCamel(field.name) + "():"+GenTypeGet(field.value.type)+"\n";
 			code += Indent + Indent + "{\n";
@@ -229,9 +292,9 @@ namespace as3{
 			std::string &code = *code_ptr;
 			std::string getter = GenGetter(field.value.type);
 
-			code += Indent + Indent + "/**\n";
-			code += Indent + Indent + " * @return " + GenTypeGet(field.value.type) + "\n";
-			code += Indent + Indent + " */\n";
+			std::vector<std::string> li;
+			li.push_back("@return " + GenTypeGet(field.value.type) );
+			GenAccessorComment(field.doc_comment, li, code_ptr);
 
 			code += Indent + Indent + "public function get"+MakeCamel(field.name)+"():"+GenTypeGet(field.value.type)+"\n";
 			code += Indent + Indent + "{\n";
@@ -243,9 +306,9 @@ namespace as3{
 		void GetStructFieldOfStruct(const FieldDef &field, std::string *code_ptr){
 			std::string &code = *code_ptr;
 
-			code += Indent + Indent + "/**\n";
-			code += Indent + Indent + " * @return " + GenTypeGet(field.value.type) + "\n";
-			code += Indent + Indent + " */\n";
+			std::vector<std::string> li;
+			li.push_back("@return " + GenTypeGet(field.value.type) );
+			GenAccessorComment(field.doc_comment, li, code_ptr);
 
 			code += Indent + Indent + "public function get"+MakeCamel(field.name)+"():"+GenTypeGet(field.value.type)+"\n";
 			code += Indent + Indent + "{\n";
@@ -258,9 +321,9 @@ namespace as3{
 		void GetStructFieldOfTable(const FieldDef &field, std::string *code_ptr){
 			std::string &code = *code_ptr;
 
-			code += Indent + Indent + "/**\n";
-			code += Indent + Indent + " * @return " + MakeCamel(GenTypeGet(field.value.type)) + "\n";
-			code += Indent + Indent + " */\n";
+			std::vector<std::string> li;
+			li.push_back("@return " + MakeCamel(GenTypeGet(field.value.type)) );
+			GenAccessorComment(field.doc_comment, li, code_ptr);
 
 			code += Indent + Indent + "public function get"+MakeCamel(field.name) + "():"+MakeCamel(GenTypeGet(field.value.type))+"\n";
 			code += Indent + Indent + "{\n";
@@ -280,9 +343,9 @@ namespace as3{
 		void GetStringField(const FieldDef &field, std::string *code_ptr){
 			std::string &code = *code_ptr;
 
-			code += Indent + Indent + "/**\n";
-			code += Indent + Indent + " * @return String\n";
-			code += Indent + Indent + " */\n";
+			std::vector<std::string> li;
+			li.push_back("@return String" );
+			GenAccessorComment(field.doc_comment, li, code_ptr);
 
 			code += Indent + Indent + "public function get"+MakeCamel(field.name)+"():String\n";
 			code += Indent + Indent + "{\n";
@@ -294,9 +357,9 @@ namespace as3{
 		void GetUnionField(const FieldDef &field, std::string *code_ptr){
 			std::string &code = *code_ptr;
 
-			code += Indent + Indent + "/**\n";
-			code += Indent + Indent + " * @return " + GenTypeBasic(field.value.type) + "\n";
-			code += Indent + Indent + " */\n";
+			std::vector<std::string> li;
+			li.push_back("@return " + GenTypeBasic(field.value.type) );
+			GenAccessorComment(field.doc_comment, li, code_ptr);
 
 			code += Indent + Indent + "public function get"+MakeCamel(field.name)+"(obj:Table):"+MakeCamel(field.name)+"\n";
 			code += Indent + Indent + "{\n";
@@ -310,9 +373,9 @@ namespace as3{
 
 			auto vectortype = field.value.type.VectorType();
 
-			code += Indent + Indent + "/**\n";
-			code += Indent + Indent + " * @return " + GenTypeBasic(field.value.type) + "\n";
-			code += Indent + Indent + " */\n";
+			std::vector<std::string> li;
+			li.push_back("@return " + MakeCamel(GenTypeGet(field.value.type)) );
+			GenAccessorComment(field.doc_comment, li, code_ptr);
 
 			code += Indent + Indent + "public function get" + MakeCamel(field.name) + "(j:int):"+MakeCamel(GenTypeGet(field.value.type))+"\n";
 			code += Indent + Indent + "{\n";
@@ -358,10 +421,10 @@ namespace as3{
 			std::string &code = *code_ptr;
 			auto vectortype = field.value.type.VectorType();
 
-			code += Indent + Indent + "/**\n";
-			code += Indent + Indent + " * @param int offset\n";
-			code += Indent + Indent + " * @return " + GenTypeGet(field.value.type) + "\n";
-			code += Indent + Indent + " */\n";
+			std::vector<std::string> li;
+			li.push_back("@param int offset");
+			li.push_back("@return " + GenTypeGet(field.value.type) );
+			GenAccessorComment(field.doc_comment, li, code_ptr);
 
 			code += Indent + Indent + "public function get"+MakeCamel(field.name) + "(j:int):"+GenTypeGet(field.value.type)+"\n";
 			code += Indent + Indent + "{\n";
@@ -378,9 +441,9 @@ namespace as3{
 			std::string &code = *code_ptr;
 			auto vectortype = field.value.type.VectorType();
 
-			code += Indent + Indent + "/**\n";
-			code += Indent + Indent + " * @return \n";
-			code += Indent + Indent + " */\n";
+			std::vector<std::string> li;
+			li.push_back("@return Array");
+			GenAccessorComment(field.doc_comment, li, code_ptr);
 
 			code += Indent + Indent + "public function get"+MakeCamel(field.name)+"Vector():Array\n";
 			code += Indent + Indent + "{\n";
@@ -563,7 +626,7 @@ namespace as3{
 		}
 
 		void GenStructAccessor(const StructDef &struct_def, const FieldDef &field, std::string *code_ptr){
-			GenComment(field.doc_comment, code_ptr, nullptr);
+			//GenComment(field.doc_comment, code_ptr, nullptr);
 
 			if(IsScalar(field.value.type.base_type)){
 				if(struct_def.fixed){
@@ -713,8 +776,8 @@ namespace as3{
 			
 			for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
 				auto &ev = **it;
-			code += Indent + Indent + Indent + Indent + "case " + NumToString(ev.value) +":\n";
-			code += Indent + Indent + Indent + Indent + Indent + "return " + FullNamespace(".", *enum_def.defined_namespace)+"."+MakeCamel(ev.name)+".getRootAs"+MakeCamel(ev.name)+"(bytes);\n";
+			code += Indent + Indent + Indent + Indent + "case " + NumToString(ev.value) +":";
+			code += "return " + FullNamespace(".", *enum_def.defined_namespace)+"."+MakeCamel(ev.name)+".getRootAs"+MakeCamel(ev.name)+"(bytes);\n";
 			}
 		
 			code += Indent + Indent + Indent + "}\n";
@@ -726,8 +789,8 @@ namespace as3{
 		void GenStruct(const StructDef &struct_def, std::string *code_ptr){
 			if(struct_def.generated)return;
 
-			GenComment(struct_def.doc_comment, code_ptr, nullptr);
-			BeginClass(struct_def, code_ptr);
+			//GenComment(struct_def.doc_comment, code_ptr, nullptr);
+			BeginClass(struct_def, code_ptr, struct_def.doc_comment);
 
 			std::string &code = *code_ptr;
 			
@@ -926,9 +989,11 @@ namespace as3{
 			std::string &code = *code_ptr;
 
 			code += "\n";
-			code += Indent + Indent + "/**\n";
-			code += Indent + Indent + " * @return int offset\n";
-			code += Indent + Indent + " */\n";
+			
+			std::vector<std::string> li;
+			li.push_back("@return int offset");
+			GenAccessorComment(struct_def.doc_comment, li, code_ptr);
+
 			code += Indent + Indent + "public static function create" + struct_def.name + "(builder:FlatBufferBuilder";
 			StructBuilderArgs(struct_def, "", code_ptr);
 			code += "):int\n";

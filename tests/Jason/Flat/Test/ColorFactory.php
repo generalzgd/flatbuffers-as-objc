@@ -13,16 +13,13 @@ public class ColorFactory
     /**
      * get struct class by enum protocol id
      */
-    public static function getProtocol($protocolId, ByteBuffer $bb):*
+    public static function getProtocol($protocolId, ByteBuffer $bb)
     {
         switch($protocolId)
         {
-            case 1:
-                return Jason.Flat.Test.Rad.getRootAsRad($bb);
-            case 2:
-                return Jason.Flat.Test.Green.getRootAsGreen($bb);
-            case 3:
-                return Jason.Flat.Test.Blue.getRootAsBlue($bb);
+            case 1:return Jason.Flat.Test.Rad.getRootAsRad($bb);
+            case 2:return Jason.Flat.Test.Green.getRootAsGreen($bb);
+            case 3:return Jason.Flat.Test.Blue.getRootAsBlue($bb);
         }
         return null;
     }

@@ -88,7 +88,7 @@ const Generator generators[] = {
     flatbuffers::GeneralMakeRule },
 
   {	flatbuffers::GenerateAS3, "-a", "--as", "AS3",
-	flatbuffers::IDLOptions::kMAX, 
+	flatbuffers::IDLOptions::kAs, 
 	"Generate ActionScript code for tables/structs",
 	flatbuffers::GeneralMakeRule },
 
