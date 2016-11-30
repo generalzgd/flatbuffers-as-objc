@@ -147,7 +147,7 @@ inline flatbuffers::Offset<TextureData> CreateTextureData(flatbuffers::FlatBuffe
     const std::vector<uint8_t> *image_data = nullptr,
     int32_t test_num2 = 0,
     int16_t image_test = 0) {
-  return CreateTextureData(_fbb, image_size, image_data ? 0 : _fbb.CreateVector<uint8_t>(*image_data), test_num2, image_test);
+  return CreateTextureData(_fbb, image_size, image_data ? _fbb.CreateVector<uint8_t>(*image_data):0, test_num2, image_test);
 }
 
 	///文理结构
@@ -229,7 +229,7 @@ inline flatbuffers::Offset<Texture> CreateTexture(flatbuffers::FlatBufferBuilder
     int16_t num_test = 30,
     int16_t num_test2 = 0,
     flatbuffers::Offset<TestAppend> test_append = 0) {
-  return CreateTexture(_fbb, texture_name ? 0 : _fbb.CreateString(texture_name), num_textures, textures ? 0 : _fbb.CreateVector<flatbuffers::Offset<TextureData>>(*textures), num_test, num_test2, test_append);
+  return CreateTexture(_fbb, texture_name ? _fbb.CreateString(texture_name):0, num_textures, textures ? _fbb.CreateVector<flatbuffers::Offset<TextureData>>(*textures):0, num_test, num_test2, test_append);
 }
 
 inline bool VerifyAny(flatbuffers::Verifier &verifier, const void *union_obj, Any type) {

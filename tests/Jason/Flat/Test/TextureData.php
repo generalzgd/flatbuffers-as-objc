@@ -74,11 +74,11 @@ class TextureData extends Table
      */
     public function getImageDataVector()
     {
-        $arr = new array();
+        $arr = [];
         $len = $this->getImageDataLength();
-        for($i=0; i<$len; $i++)
+        for($i=0; $i<$len; $i++)
         {
-            array_push($arr, $this->getImageData(i) );
+            array_push($arr, $this->getImageData($i) );
         }
         return $arr;
     }
@@ -106,13 +106,13 @@ class TextureData extends Table
      */
     public function toJson()
     {
-        $o = new array();
+        $o = [];
         $o['image_size'] = $this->getImageSize();
-        $arr = new array();
+        $arr = [];
         $len = $this->getImageDataLength();
-        for($i=0; i<$len; $i++)
+        for($i=0; $i<$len; $i++)
         {
-            $e = $this->getImageData(i);
+            $e = $this->getImageData($i);
             array_push($arr, $e );
         }
         $o['image_data'] = $arr;

@@ -456,11 +456,11 @@ namespace php {
 
 		code += Indent + "public function get"+MakeCamel(field.name)+"Vector()\n";
 		code += Indent + "{\n";
-		code += Indent + Indent + "$arr = new array();\n";
+		code += Indent + Indent + "$arr = [];\n";
 		code += Indent + Indent + "$len = $this->get"+MakeCamel(field.name)+"Length();\n";
-		code += Indent + Indent + "for($i=0; i<$len; $i++)\n";
+		code += Indent + Indent + "for($i=0; $i<$len; $i++)\n";
 		code += Indent + Indent + "{\n";
-		code += Indent + Indent + Indent + "array_push($arr, $this->get"+MakeCamel(field.name)+"(i) );\n";
+		code += Indent + Indent + Indent + "array_push($arr, $this->get"+MakeCamel(field.name)+"($i) );\n";
 		code += Indent + Indent + "}\n";
 		code += Indent + Indent + "return $arr;\n";
 		code += Indent + "}\n\n";
@@ -771,7 +771,7 @@ namespace php {
 		code += Indent + " */\n";
 		code += Indent + "public function toJson()\n";
 		code += Indent + "{\n";
-		code += Indent + Indent + "$o = new array();\n";
+		code += Indent + Indent + "$o = [];\n";
 			
 		for(auto it = struct_def.fields.vec.begin(); it!=struct_def.fields.vec.end(); ++it){
 			auto &field = **it;
@@ -800,7 +800,7 @@ namespace php {
 
 		auto vector_type = field.value.type.VectorType();
 
-		code += Indent + Indent + "$arr = new array();\n";
+		code += Indent + Indent + "$arr = [];\n";
 		code += Indent + Indent + "$len = $this->get"+MakeCamel(field.name)+"Length();\n";
 		code += Indent + Indent + "for($i=0; $i<$len; $i++)\n";
 		code += Indent + Indent + "{\n";

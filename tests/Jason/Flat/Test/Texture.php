@@ -72,11 +72,11 @@ class Texture extends Table
      */
     public function getTexturesVector()
     {
-        $arr = new array();
+        $arr = [];
         $len = $this->getTexturesLength();
-        for($i=0; i<$len; $i++)
+        for($i=0; $i<$len; $i++)
         {
-            array_push($arr, $this->getTextures(i) );
+            array_push($arr, $this->getTextures($i) );
         }
         return $arr;
     }
@@ -111,14 +111,14 @@ class Texture extends Table
      */
     public function toJson()
     {
-        $o = new array();
+        $o = [];
         $o['texture_name'] = $this->getTextureName();
         $o['num_textures'] = $this->getNumTextures();
-        $arr = new array();
+        $arr = [];
         $len = $this->getTexturesLength();
-        for($i=0; i<$len; $i++)
+        for($i=0; $i<$len; $i++)
         {
-            $e = $this->getTextures(i);
+            $e = $this->getTextures($i);
             array_push($arr, $e.toJson() );
         }
         $o['textures'] = $arr;

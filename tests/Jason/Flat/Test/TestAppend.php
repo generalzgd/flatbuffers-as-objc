@@ -56,7 +56,7 @@ class TestAppend extends Table
      */
     public function toJson()
     {
-        $o = new array();
+        $o = [];
         $o['test_num'] = $this->getTestNum();
         $o['test_num2'] = $this->getTestNum2();
         return $o;
