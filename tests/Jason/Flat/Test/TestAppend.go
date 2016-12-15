@@ -17,6 +17,11 @@ func GetRootAsTestAppend(buf []byte, offset flatbuffers.UOffsetT) *TestAppend {
 	return x
 }
 
+func NewTestAppend()*TestAppend{
+	x := &TestAppend{}
+	return x
+}
+
 func (rcv *TestAppend) Init(buf []byte, i flatbuffers.UOffsetT) {
 	rcv._tab.Bytes = buf
 	rcv._tab.Pos = i
@@ -38,7 +43,15 @@ func (rcv *TestAppend) TestNum2() int32 {
 	return 0
 }
 
-func TestAppendStart(builder *flatbuffers.Builder) { builder.StartObject(2) }
-func TestAppendAddTestNum(builder *flatbuffers.Builder, testNum int32) { builder.PrependInt32Slot(0, testNum, 0) }
-func TestAppendAddTestNum2(builder *flatbuffers.Builder, testNum2 int32) { builder.PrependInt32Slot(1, testNum2, 0) }
-func TestAppendEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT { return builder.EndObject() }
+func (rcv *TestAppend) Start(builder *flatbuffers.Builder) { builder.StartObject(2) }
+func (rcv *TestAppend) AddTestNum(builder *flatbuffers.Builder, testNum int32) { builder.PrependInt32Slot(0, testNum, 0) }
+func (rcv *TestAppend) AddTestNum2(builder *flatbuffers.Builder, testNum2 int32) { builder.PrependInt32Slot(1, testNum2, 0) }
+func (rcv *TestAppend) End(builder *flatbuffers.Builder) flatbuffers.UOffsetT { return builder.EndObject() }
+
+func (rcv *TestAppend) Create(builder *flatbuffers.Builder, testNum int32, testNum2 int32) flatbuffers.UOffsetT {
+	builder.StartObject(2)
+	rcv.AddTestNum(builder, testNum)
+	rcv.AddTestNum2(builder, testNum2)
+	return builder.EndObject()
+}
+

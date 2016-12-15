@@ -17,6 +17,11 @@ func GetRootAsTexture(buf []byte, offset flatbuffers.UOffsetT) *Texture {
 	return x
 }
 
+func NewTexture()*Texture{
+	x := &Texture{}
+	return x
+}
+
 func (rcv *Texture) Init(buf []byte, i flatbuffers.UOffsetT) {
 	rcv._tab.Bytes = buf
 	rcv._tab.Pos = i
@@ -90,13 +95,25 @@ func (rcv *Texture) TestAppend(obj *TestAppend) *TestAppend {
 	return nil
 }
 
-func TextureStart(builder *flatbuffers.Builder) { builder.StartObject(7) }
-func TextureAddTextureName(builder *flatbuffers.Builder, textureName flatbuffers.UOffsetT) { builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(textureName), 0) }
-func TextureAddNumTextures(builder *flatbuffers.Builder, numTextures int16) { builder.PrependInt16Slot(1, numTextures, 0) }
-func TextureAddTextures(builder *flatbuffers.Builder, textures flatbuffers.UOffsetT) { builder.PrependUOffsetTSlot(2, flatbuffers.UOffsetT(textures), 0) }
-func TextureStartTexturesVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT { return builder.StartVector(4, numElems, 4)
+func (rcv *Texture) Start(builder *flatbuffers.Builder) { builder.StartObject(7) }
+func (rcv *Texture) AddTextureName(builder *flatbuffers.Builder, textureName flatbuffers.UOffsetT) { builder.PrependUOffsetTSlot(0, flatbuffers.UOffsetT(textureName), 0) }
+func (rcv *Texture) AddNumTextures(builder *flatbuffers.Builder, numTextures int16) { builder.PrependInt16Slot(1, numTextures, 0) }
+func (rcv *Texture) AddTextures(builder *flatbuffers.Builder, textures flatbuffers.UOffsetT) { builder.PrependUOffsetTSlot(2, flatbuffers.UOffsetT(textures), 0) }
+func (rcv *Texture) StartTexturesVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT { return builder.StartVector(4, numElems, 4)
 }
-func TextureAddNumTest(builder *flatbuffers.Builder, numTest int16) { builder.PrependInt16Slot(3, numTest, 30) }
-func TextureAddNumTest2(builder *flatbuffers.Builder, numTest2 int16) { builder.PrependInt16Slot(5, numTest2, 0) }
-func TextureAddTestAppend(builder *flatbuffers.Builder, testAppend flatbuffers.UOffsetT) { builder.PrependUOffsetTSlot(6, flatbuffers.UOffsetT(testAppend), 0) }
-func TextureEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT { return builder.EndObject() }
+func (rcv *Texture) AddNumTest(builder *flatbuffers.Builder, numTest int16) { builder.PrependInt16Slot(3, numTest, 30) }
+func (rcv *Texture) AddNumTest2(builder *flatbuffers.Builder, numTest2 int16) { builder.PrependInt16Slot(5, numTest2, 0) }
+func (rcv *Texture) AddTestAppend(builder *flatbuffers.Builder, testAppend flatbuffers.UOffsetT) { builder.PrependUOffsetTSlot(6, flatbuffers.UOffsetT(testAppend), 0) }
+func (rcv *Texture) End(builder *flatbuffers.Builder) flatbuffers.UOffsetT { return builder.EndObject() }
+
+func (rcv *Texture) Create(builder *flatbuffers.Builder, textureName int, numTextures int16, textures int, numTest int16, numTest1 int16, numTest2 int16, testAppend int) flatbuffers.UOffsetT {
+	builder.StartObject(7)
+	rcv.AddTextureName(builder, textureName)
+	rcv.AddNumTextures(builder, numTextures)
+	rcv.AddTextures(builder, textures)
+	rcv.AddNumTest(builder, numTest)
+	rcv.AddNumTest2(builder, numTest2)
+	rcv.AddTestAppend(builder, testAppend)
+	return builder.EndObject()
+}
+

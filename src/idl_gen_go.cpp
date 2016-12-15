@@ -37,8 +37,8 @@ namespace go {
 
 static std::string GenGetter(const Type &type);
 static std::string GenMethod(const FieldDef &field);
-static void GenStructBuilder(const StructDef &struct_def,
-                             std::string *code_ptr);
+static void GenStructBuilder(const StructDef &struct_def, std::string *code_ptr);
+static void GenTableBuilder(const StructDef &struct_def, std::string *code_ptr);
 static void GenReceiver(const StructDef &struct_def, std::string *code_ptr);
 static std::string GenTypeBasic(const Type &type);
 static std::string GenTypeGet(const Type &type);
@@ -103,6 +103,20 @@ static void NewRootTypeFromBuffer(const StructDef &struct_def,
   code += "\tx.Init(buf, n + offset)\n";
   code += "\treturn x\n";
   code += "}\n\n";
+}
+
+//空实例对象
+static void NewEmptyInstance(const StructDef &struct_def, std::string *code_ptr){
+	std::string &code = *code_ptr;
+
+	code += "func New";
+	code += struct_def.name;
+	code += "()";
+	code += "*"+struct_def.name;
+	code += "{\n";
+	code += "\tx := &"+struct_def.name+"{}\n";
+	code += "\treturn x\n";
+	code += "}\n\n";
 }
 
 // Initialize an existing object with other data, to avoid an allocation.
@@ -301,7 +315,7 @@ static void BeginBuilderArgs(const StructDef &struct_def,
   std::string &code = *code_ptr;
 
   code += "\n";
-  code += "func Create" + struct_def.name;
+  code += "func (rcv *" + struct_def.name + ") Create";
   code += "(builder *flatbuffers.Builder";
 }
 
@@ -371,7 +385,7 @@ static void EndBuilderBody(std::string *code_ptr) {
 static void GetStartOfTable(const StructDef &struct_def,
                             std::string *code_ptr) {
   std::string &code = *code_ptr;
-  code += "func " + struct_def.name + "Start";
+  code += "func (rcv *" + struct_def.name + ") Start";
   code += "(builder *flatbuffers.Builder) { ";
   code += "builder.StartObject(";
   code += NumToString(struct_def.fields.vec.size());
@@ -384,7 +398,7 @@ static void BuildFieldOfTable(const StructDef &struct_def,
                               const size_t offset,
                               std::string *code_ptr) {
   std::string &code = *code_ptr;
-  code += "func " + struct_def.name + "Add" + MakeCamel(field.name);
+  code += "func (rcv *" + struct_def.name + ") Add" + MakeCamel(field.name);
   code += "(builder *flatbuffers.Builder, ";
   code += MakeCamel(field.name, false) + " ";
   if (!IsScalar(field.value.type.base_type) && (!struct_def.fixed)) {
@@ -412,7 +426,7 @@ static void BuildVectorOfTable(const StructDef &struct_def,
                                const FieldDef &field,
                                std::string *code_ptr) {
   std::string &code = *code_ptr;
-  code += "func " + struct_def.name + "Start";
+  code += "func (rcv *" + struct_def.name + ") Start";
   code += MakeCamel(field.name);
   code += "Vector(builder *flatbuffers.Builder, numElems int) ";
   code += "flatbuffers.UOffsetT { return builder.StartVector(";
@@ -428,7 +442,7 @@ static void BuildVectorOfTable(const StructDef &struct_def,
 static void GetEndOffsetOnTable(const StructDef &struct_def,
                                 std::string *code_ptr) {
   std::string &code = *code_ptr;
-  code += "func " + struct_def.name + "End";
+  code += "func (rcv *" + struct_def.name + ") End";
   code += "(builder *flatbuffers.Builder) flatbuffers.UOffsetT ";
   code += "{ return builder.EndObject() }\n";
 }
@@ -486,14 +500,40 @@ static void GenStructAccessor(const StructDef &struct_def,
   }
 }
 
+//创建一个所有的参数的builder
+static void GenTableBuilder(const StructDef &struct_def, std::string *code_ptr){
+	BeginBuilderArgs(struct_def, code_ptr);
+	StructBuilderArgs(struct_def, "", code_ptr);
+	EndBuilderArgs(code_ptr);
+
+	std::string &code = *code_ptr;
+
+	code += "\tbuilder.StartObject(" + NumToString(struct_def.fields.vec.size()) + ")\n";
+
+	for(auto it = struct_def.fields.vec.begin(); it != struct_def.fields.vec.end(); ++it){
+		auto &field = **it;
+		if(field.deprecated)continue;
+
+		auto offset = it - struct_def.fields.vec.begin();
+
+		if (!IsScalar(field.value.type.base_type) && (!struct_def.fixed)) {
+			code += "\trcv.Add"+MakeCamel(field.name)+"(builder, flatbuffers.UOffsetT(" + MakeCamel(field.name, false) + "))\n";
+		}else{
+			code += "\trcv.Add"+MakeCamel(field.name)+"(builder, " + MakeCamel(field.name, false) + ")\n";
+		}
+		
+	}
+
+	code += "\treturn builder.EndObject()\n";
+	code += "}\n\n";
+}
+
 // Generate table constructors, conditioned on its members' types.
 static void GenTableBuilders(const StructDef &struct_def,
                              std::string *code_ptr) {
   GetStartOfTable(struct_def, code_ptr);
 
-  for (auto it = struct_def.fields.vec.begin();
-       it != struct_def.fields.vec.end();
-       ++it) {
+  for (auto it = struct_def.fields.vec.begin(); it != struct_def.fields.vec.end(); ++it) {
     auto &field = **it;
     if (field.deprecated) continue;
 
@@ -541,6 +581,7 @@ static void GenStruct(const StructDef &struct_def,
     // Generate a special accessor for the table that has been declared as
     // the root type.
     NewRootTypeFromBuffer(struct_def, code_ptr);
+	NewEmptyInstance(struct_def, code_ptr);
   //}
   // Generate the Init method that sets the field in a pre-existing
   // accessor object. This is to allow object reuse.
@@ -556,8 +597,11 @@ static void GenStruct(const StructDef &struct_def,
     // create a struct constructor function
     GenStructBuilder(struct_def, code_ptr);
   } else {
+	
     // Create a set of functions that allow table construction.
     GenTableBuilders(struct_def, code_ptr);
+	//
+	GenTableBuilder(struct_def, code_ptr);
   }
 }
 
@@ -640,6 +684,8 @@ static void GenStructBuilder(const StructDef &struct_def,
   StructBuilderBody(struct_def, "", code_ptr);
   EndBuilderBody(code_ptr);
 }
+
+
 
 class GoGenerator : public BaseGenerator {
  public:

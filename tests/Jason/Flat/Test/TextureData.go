@@ -17,6 +17,11 @@ func GetRootAsTextureData(buf []byte, offset flatbuffers.UOffsetT) *TextureData 
 	return x
 }
 
+func NewTextureData()*TextureData{
+	x := &TextureData{}
+	return x
+}
+
 func (rcv *TextureData) Init(buf []byte, i flatbuffers.UOffsetT) {
 	rcv._tab.Bytes = buf
 	rcv._tab.Pos = i
@@ -71,11 +76,21 @@ func (rcv *TextureData) ImageTest() int16 {
 	return 0
 }
 
-func TextureDataStart(builder *flatbuffers.Builder) { builder.StartObject(4) }
-func TextureDataAddImageSize(builder *flatbuffers.Builder, imageSize int32) { builder.PrependInt32Slot(0, imageSize, 0) }
-func TextureDataAddImageData(builder *flatbuffers.Builder, imageData flatbuffers.UOffsetT) { builder.PrependUOffsetTSlot(1, flatbuffers.UOffsetT(imageData), 0) }
-func TextureDataStartImageDataVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT { return builder.StartVector(1, numElems, 1)
+func (rcv *TextureData) Start(builder *flatbuffers.Builder) { builder.StartObject(4) }
+func (rcv *TextureData) AddImageSize(builder *flatbuffers.Builder, imageSize int32) { builder.PrependInt32Slot(0, imageSize, 0) }
+func (rcv *TextureData) AddImageData(builder *flatbuffers.Builder, imageData flatbuffers.UOffsetT) { builder.PrependUOffsetTSlot(1, flatbuffers.UOffsetT(imageData), 0) }
+func (rcv *TextureData) StartImageDataVector(builder *flatbuffers.Builder, numElems int) flatbuffers.UOffsetT { return builder.StartVector(1, numElems, 1)
 }
-func TextureDataAddTestNum2(builder *flatbuffers.Builder, testNum2 int32) { builder.PrependInt32Slot(2, testNum2, 0) }
-func TextureDataAddImageTest(builder *flatbuffers.Builder, imageTest int16) { builder.PrependInt16Slot(3, imageTest, 0) }
-func TextureDataEnd(builder *flatbuffers.Builder) flatbuffers.UOffsetT { return builder.EndObject() }
+func (rcv *TextureData) AddTestNum2(builder *flatbuffers.Builder, testNum2 int32) { builder.PrependInt32Slot(2, testNum2, 0) }
+func (rcv *TextureData) AddImageTest(builder *flatbuffers.Builder, imageTest int16) { builder.PrependInt16Slot(3, imageTest, 0) }
+func (rcv *TextureData) End(builder *flatbuffers.Builder) flatbuffers.UOffsetT { return builder.EndObject() }
+
+func (rcv *TextureData) Create(builder *flatbuffers.Builder, imageSize int32, imageData int, testNum2 int32, imageTest int16) flatbuffers.UOffsetT {
+	builder.StartObject(4)
+	rcv.AddImageSize(builder, imageSize)
+	rcv.AddImageData(builder, imageData)
+	rcv.AddTestNum2(builder, testNum2)
+	rcv.AddImageTest(builder, imageTest)
+	return builder.EndObject()
+}
+
