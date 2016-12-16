@@ -106,14 +106,21 @@ func (rcv *Texture) AddNumTest2(builder *flatbuffers.Builder, numTest2 int16) { 
 func (rcv *Texture) AddTestAppend(builder *flatbuffers.Builder, testAppend flatbuffers.UOffsetT) { builder.PrependUOffsetTSlot(6, flatbuffers.UOffsetT(testAppend), 0) }
 func (rcv *Texture) End(builder *flatbuffers.Builder) flatbuffers.UOffsetT { return builder.EndObject() }
 
-func (rcv *Texture) Create(builder *flatbuffers.Builder, textureName int, numTextures int16, textures int, numTest int16, numTest1 int16, numTest2 int16, testAppend int) flatbuffers.UOffsetT {
+func (rcv *Texture) Create(builder *flatbuffers.Builder, 
+textureName flatbuffers.UOffsetT, 
+numTextures int16, 
+textures flatbuffers.UOffsetT, 
+numTest int16, 
+numTest1 int16, 
+numTest2 int16, 
+testAppend flatbuffers.UOffsetT) flatbuffers.UOffsetT {
 	builder.StartObject(7)
-	rcv.AddTextureName(builder, textureName)
+	rcv.AddTextureName(builder, flatbuffers.UOffsetT(textureName))
 	rcv.AddNumTextures(builder, numTextures)
-	rcv.AddTextures(builder, textures)
+	rcv.AddTextures(builder, flatbuffers.UOffsetT(textures))
 	rcv.AddNumTest(builder, numTest)
 	rcv.AddNumTest2(builder, numTest2)
-	rcv.AddTestAppend(builder, testAppend)
+	rcv.AddTestAppend(builder, flatbuffers.UOffsetT(testAppend))
 	return builder.EndObject()
 }
 

@@ -85,10 +85,14 @@ func (rcv *TextureData) AddTestNum2(builder *flatbuffers.Builder, testNum2 int32
 func (rcv *TextureData) AddImageTest(builder *flatbuffers.Builder, imageTest int16) { builder.PrependInt16Slot(3, imageTest, 0) }
 func (rcv *TextureData) End(builder *flatbuffers.Builder) flatbuffers.UOffsetT { return builder.EndObject() }
 
-func (rcv *TextureData) Create(builder *flatbuffers.Builder, imageSize int32, imageData int, testNum2 int32, imageTest int16) flatbuffers.UOffsetT {
+func (rcv *TextureData) Create(builder *flatbuffers.Builder, 
+imageSize int32, 
+imageData flatbuffers.UOffsetT, 
+testNum2 int32, 
+imageTest int16) flatbuffers.UOffsetT {
 	builder.StartObject(4)
 	rcv.AddImageSize(builder, imageSize)
-	rcv.AddImageData(builder, imageData)
+	rcv.AddImageData(builder, flatbuffers.UOffsetT(imageData))
 	rcv.AddTestNum2(builder, testNum2)
 	rcv.AddImageTest(builder, imageTest)
 	return builder.EndObject()

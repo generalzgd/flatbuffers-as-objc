@@ -344,6 +344,20 @@ static void StructBuilderArgs(const StructDef &struct_def,
   }
 }
 
+static void TableBuilderArgs(const StructDef &struct_def,	const char *nameprefix,	std::string *code_ptr) {
+	std::string &code = *code_ptr;
+	for (auto it = struct_def.fields.vec.begin();it != struct_def.fields.vec.end();	++it) {
+		auto &field = **it;
+		if (!IsScalar(field.value.type.base_type) && (!struct_def.fixed)) {
+			code += (std::string)", " + nameprefix + MakeCamel(field.name, false) + " flatbuffers.UOffsetT";
+		} else {
+			code += (std::string)", " + nameprefix;
+			code += MakeCamel(field.name, false);
+			code += " " + GenTypeBasic(field.value.type);
+		}
+	}
+}
+
 // End the creator function signature.
 static void EndBuilderArgs(std::string *code_ptr) {
   std::string &code = *code_ptr;
@@ -503,7 +517,7 @@ static void GenStructAccessor(const StructDef &struct_def,
 //创建一个所有的参数的builder
 static void GenTableBuilder(const StructDef &struct_def, std::string *code_ptr){
 	BeginBuilderArgs(struct_def, code_ptr);
-	StructBuilderArgs(struct_def, "", code_ptr);
+	TableBuilderArgs(struct_def, "", code_ptr);
 	EndBuilderArgs(code_ptr);
 
 	std::string &code = *code_ptr;
@@ -515,12 +529,12 @@ static void GenTableBuilder(const StructDef &struct_def, std::string *code_ptr){
 		if(field.deprecated)continue;
 
 		auto offset = it - struct_def.fields.vec.begin();
-
-		if (!IsScalar(field.value.type.base_type) && (!struct_def.fixed)) {
-			code += "\trcv.Add"+MakeCamel(field.name)+"(builder, flatbuffers.UOffsetT(" + MakeCamel(field.name, false) + "))\n";
-		}else{
-			code += "\trcv.Add"+MakeCamel(field.name)+"(builder, " + MakeCamel(field.name, false) + ")\n";
-		}
+		code += "\trcv.Add"+MakeCamel(field.name)+"(builder, " + MakeCamel(field.name, false) + ")\n";
+		//if (!IsScalar(field.value.type.base_type) && (!struct_def.fixed)) {
+		//	code += "\trcv.Add"+MakeCamel(field.name)+"(builder, flatbuffers.UOffsetT(" + MakeCamel(field.name, false) + "))\n";
+		//}else{
+		//	code += "\trcv.Add"+MakeCamel(field.name)+"(builder, " + MakeCamel(field.name, false) + ")\n";
+		//}
 		
 	}
 

@@ -48,7 +48,9 @@ func (rcv *TestAppend) AddTestNum(builder *flatbuffers.Builder, testNum int32) {
 func (rcv *TestAppend) AddTestNum2(builder *flatbuffers.Builder, testNum2 int32) { builder.PrependInt32Slot(1, testNum2, 0) }
 func (rcv *TestAppend) End(builder *flatbuffers.Builder) flatbuffers.UOffsetT { return builder.EndObject() }
 
-func (rcv *TestAppend) Create(builder *flatbuffers.Builder, testNum int32, testNum2 int32) flatbuffers.UOffsetT {
+func (rcv *TestAppend) Create(builder *flatbuffers.Builder, 
+testNum int32, 
+testNum2 int32) flatbuffers.UOffsetT {
 	builder.StartObject(2)
 	rcv.AddTestNum(builder, testNum)
 	rcv.AddTestNum2(builder, testNum2)
