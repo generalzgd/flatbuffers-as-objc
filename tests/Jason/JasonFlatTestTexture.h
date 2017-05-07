@@ -22,4 +22,6 @@
 
 @property (nonatomic, strong)JasonFlatTestTestAppend *test_append;
 
+/// get json obj from flatbuffer
+@property (nonatomic, strong) NSDictionary getJsonObj;
 @end

@@ -127,4 +127,23 @@
 
 }
 
+/// get json obj from flatbuffer
+- (NSDictionary) getJsonObj {
+	NSMutableDictionary *dic = [[NSMutableDictionary alloc]init];
+	FBMutableArray *vec,int len, int i,NSMutableArray *arr;
+
+	[dic setValue:[self texture_name] forKey:@"texture_name"]
+	[dic setValue:[self num_textures] forKey:@"num_textures"]
+	vec = [self textures]
+	len = [vec count]
+	arr = [NSMutableArray arrayWithCapacity:len];
+	for(i=0; i<len; i++){
+		[arr addObject:[[vec objectAtIndex:i] getJsonObj]]
+	}
+	[dic setValue:arr forKey:@"textures"]
+	[dic setValue:[self num_test] forKey:@"num_test"]
+	[dic setValue:[self num_test2] forKey:@"num_test2"]
+	[dic setValue:[[self test_append] getJsonObj] forKey:@"test_append"]
+	return dic;
+}
 @end

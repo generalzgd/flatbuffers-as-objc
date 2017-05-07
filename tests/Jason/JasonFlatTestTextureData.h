@@ -16,4 +16,6 @@
 
 @property (nonatomic, assign)int16_t image_test;
 
+/// get json obj from flatbuffer
+@property (nonatomic, strong) NSDictionary getJsonObj;
 @end

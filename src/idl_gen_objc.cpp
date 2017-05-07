@@ -121,7 +121,6 @@ class ObjcGenerator : public BaseGenerator {
                     namespace_dir += *it + kPathSeparator;
                     break;
                 }
-                    
             }
 
             EnsureDirExists(namespace_dir);
@@ -132,6 +131,30 @@ class ObjcGenerator : public BaseGenerator {
             auto filename = namespace_dir + defname + lang.header_file_extension;
             return SaveFile(filename.c_str(), code, false);
         }
+
+		static bool SaveFactoryHeader(const LanguageParameters &lang, const Parser &parser, 
+										const std::string &defname, const std::string &classcode, 
+										const std::string &path, bool needs_includes, bool onefile){
+			if(!classcode.length())return true;
+
+			std::string namespace_dir = path;
+			auto &namespaces = parser.namespaces_.back()->components;
+			for (auto it = namespaces.begin(); it != namespaces.end(); ++it){
+				if (!onefile){
+					namespace_dir += *it + kPathSeparator;
+					break;
+				}
+			}
+
+			EnsureDirExists(namespace_dir);
+
+			std::string code = "// automatically generated, do not modify !!!\n\n";
+			if(needs_includes) code += lang.includes;
+			code += classcode;
+
+			auto filename = namespace_dir + defname + lang.header_file_extension;
+			return SaveFile(filename.c_str(), code, false);
+		}
             
         static bool SaveClass(const LanguageParameters &lang, const Parser &parser,
                                 const std::string &defname, const std::string &classcode,
@@ -155,6 +178,29 @@ class ObjcGenerator : public BaseGenerator {
             auto filename = namespace_dir + defname + lang.content_file_extension;
             return SaveFile(filename.c_str(), code, false);
         }
+
+		static bool SaveFactoryClass(const LanguageParameters &lang, const Parser &parser, 
+			const std::string &defname, const std::string &classcode, 
+			const std::string &path, bool needs_includes, bool onefile){
+			if(!classcode.length())return true;
+
+			std::string namespace_dir = path;
+			auto &namespaces = parser.namespaces_.back()->components;
+			for (auto it=namespaces.begin(); it!=namespaces.end();++it)	{
+				if (!onefile){
+					namespace_dir += *it + kPathSeparator;
+					break;
+				}
+			}
+
+			EnsureDirExists(namespace_dir);
+
+			std::string code = "// automatically generated, do not modify !!!\n\n";
+			if (needs_includes)code += lang.includes;
+			code += classcode;
+			auto filename = namespace_dir + defname + lang.content_file_extension;
+			return SaveFile(filename.c_str(), code, false);
+		}
             
         // Generate a documentation comment, if available.
         static void GenComment(const std::vector<std::string> &dc, std::string *code_ptr,
@@ -183,6 +229,8 @@ class ObjcGenerator : public BaseGenerator {
                 code += prefixStr + std::string(config->last_line) + "\n";
             }
         }
+
+		
             
         static std::string GenNumberMethod(const BaseType &type) {
                 
@@ -523,7 +571,54 @@ class ObjcGenerator : public BaseGenerator {
             // Close the class
             code += "};\n\n";
         }
-        static void GenClass(const LanguageParameters &lang, const Parser &parser,
+        
+		static void GenFactory(const LanguageParameters &lang, const Parser &parser, 
+								EnumDef &enum_def, std::string *code_ptr, std::string *content_code_ptr) {
+			if(enum_def.generated)return;
+			std::string tempcode;
+			std::string headercode;
+			std::string &code = tempcode;
+			std::string &content_code = *content_code_ptr;
+			std::string &real_code = *code_ptr;
+			//
+			headercode += "#import <Foundation/Foundation.h>";
+
+			headercode += "\n\n";
+			headercode += "/// usage\n";
+			headercode += "/// #import \"Factory.h\"\n";
+			headercode += "/// [Factory getInstance:1 buf:nil]\n";
+			headercode += "\n\n";
+
+			headercode += "@interface "+nameSpace(parser) + enum_def.name + "Factory : NSObject\n";
+			headercode += "+ (instancetype)getInstance:(uint32_t)protocolId buf:(NSMutableData *)buf;\n";
+			headercode += "\n@end\n";
+			//
+			//
+			content_code += "#import \""+nameSpace(parser) + enum_def.name+"Factory.h\"\n";
+			content_code += "\n\n";
+			content_code += "@implementation "+nameSpace(parser) + enum_def.name+"Factory";
+			content_code += "\n\n";
+
+			content_code += "+ (instancetype)getInstance:(uint32_t)protocolId buf:(NSMutableData *)buf {\n";
+			content_code += "	switch (protocolId) {\n";
+
+			for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
+				auto &ev = **it;
+				content_code += "		case "+NumToString(ev.value)+":\n";
+				content_code += "			return ["+nameSpace(parser)+ev.name+" getRootAs:(FBMutableData *)buf];\n";
+			}
+
+			content_code += "		default:\n";
+			content_code += "			break;\n";
+			content_code += "	}\n";
+			content_code += "	return nil;\n";
+			content_code += "}\n";
+			content_code += "\n@end\n";
+
+			real_code = headercode;
+		}
+		
+		static void GenClass(const LanguageParameters &lang, const Parser &parser,
                                 StructDef &struct_def, std::string *code_ptr, std::string *content_code_ptr) {
             if (struct_def.generated) return;
             std::string tempcode;
@@ -795,6 +890,9 @@ class ObjcGenerator : public BaseGenerator {
             content_code += "    return self;\n\n";
             content_code += "}\n\n";
                 
+			if(parser.opts.generate_json){
+				GenJsonBuilder(lang, parser, struct_def, &code, &content_code);
+			}
 
             code += "@end\n";
                 
@@ -803,6 +901,56 @@ class ObjcGenerator : public BaseGenerator {
             real_code += headercode +"\n\n"+ code;
         }
 
+		static void GenJsonBuilder(const LanguageParameters &lang, const Parser &parser,
+									StructDef &struct_def, std::string *head_code_ptr, std::string *content_code_ptr){
+			std::string &content_code = *content_code_ptr;
+			std::string &head_code = *head_code_ptr;
+
+			head_code += "/// get json obj from flatbuffer\n";
+			head_code += "@property (nonatomic, strong) NSDictionary getJsonObj;\n";
+			//
+			content_code += "/// get json obj from flatbuffer\n";
+			content_code += "- (NSDictionary) getJsonObj {\n";
+			content_code += "	NSMutableDictionary *dic = [[NSMutableDictionary alloc]init];\n";
+
+			for(auto it = struct_def.fields.vec.begin(); it!=struct_def.fields.vec.end(); ++it){
+				auto &tmpfield = **it;
+				if(tmpfield.value.type.base_type == BASE_TYPE_VECTOR){
+					content_code += "	FBMutableArray *vec,int len, int i,NSMutableArray *arr;\n";
+					break;
+				}
+			}
+
+			content_code += "\n";
+
+			for(auto it = struct_def.fields.vec.begin(); it != struct_def.fields.vec.end(); ++it){
+				auto &field = **it;
+				if(!field.deprecated){
+					if(IsScalar(field.value.type.base_type)){
+						content_code += "	[dic setValue:[self "+field.name+"] forKey:@\""+field.name+"\"]\n";
+					} else if(field.value.type.base_type == BASE_TYPE_STRING) {
+						content_code += "	[dic setValue:[self "+field.name+"] forKey:@\""+field.name+"\"]\n";
+					} else if(field.value.type.base_type == BASE_TYPE_VECTOR) {
+						auto vector_type = field.value.type.VectorType();
+						content_code += "	vec = [self "+field.name+"]\n";
+						content_code += "	len = [vec count]\n";
+						content_code += "	arr = [NSMutableArray arrayWithCapacity:len];\n";
+						content_code += "	for(i=0; i<len; i++){\n";
+						if(vector_type.base_type == BASE_TYPE_STRUCT){
+							content_code += "		[arr addObject:[[vec objectAtIndex:i] getJsonObj]]\n";
+						} else {
+							content_code += "		[arr addObject:[vec objectAtIndex:i]]\n";
+						}
+						content_code += "	}\n";
+						content_code += "	[dic setValue:arr forKey:@\""+field.name+"\"]\n";
+					} else {
+						content_code += "	[dic setValue:[[self "+field.name+"] getJsonObj] forKey:@\""+field.name+"\"]\n";
+					}
+				}
+			}
+			content_code += "	return dic;\n";
+			content_code += "}\n";
+		}
             
         ObjcGenerator(const Parser &parser, const std::string &path,
                         const std::string &file_name)
@@ -821,6 +969,17 @@ class ObjcGenerator : public BaseGenerator {
                     if (!SaveHeader(lang, parser_, nameSpace(parser_) + (**it).name, enumcode, path_, false,false))
                         return false;
                 }
+
+				auto &enum_def = **it;
+				if(&enum_def == parser_.factory_enum_def_){
+					std::string declcode;
+					std::string contentcode;
+					GenFactory(lang, parser_, enum_def, &declcode, &contentcode);
+					if(!SaveFactoryHeader(lang, parser_, nameSpace(parser_) + (**it).name+"Factory", declcode, path_, true, false))
+						return false;
+					if(!SaveFactoryClass(lang, parser_, nameSpace(parser_) + (**it).name+"Factory", contentcode, path_, true, false))
+						return false;
+				}
             }
                 
             for (auto it = parser_.structs_.vec.begin();
