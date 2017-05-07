@@ -7,7 +7,7 @@
 /// [Factory getInstance:1 buf:nil]
 
 
-@interface JasonFlatTestColorFactory : NSObject
+@interface JasonFlatTestClassesFactory : NSObject
 + (instancetype)getInstance:(uint32_t)protocolId buf:(NSMutableData *)buf;
 
 @end
