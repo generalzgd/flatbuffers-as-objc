@@ -67,8 +67,8 @@
 - (NSDictionary *) getJsonObj {
 	NSMutableDictionary *dic = [[NSMutableDictionary alloc]init];
 
-	[dic setValue:[self test_num] forKey:@"test_num"];
-	[dic setValue:[self test_num2] forKey:@"test_num2"];
+	[dic setValue:@([self test_num]) forKey:@"test_num"];
+	[dic setValue:@([self test_num2]) forKey:@"test_num2"];
 	return dic;
 }
 @end
