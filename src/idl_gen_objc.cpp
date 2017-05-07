@@ -595,6 +595,12 @@ class ObjcGenerator : public BaseGenerator {
 			//
 			//
 			content_code += "#import \""+nameSpace(parser) + enum_def.name+"Factory.h\"\n";
+
+			for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
+				auto &ev = **it;
+				content_code += "#import \""+nameSpace(parser)+ev.name+".h\"\n";
+			}
+
 			content_code += "\n\n";
 			content_code += "@implementation "+nameSpace(parser) + enum_def.name+"Factory";
 			content_code += "\n\n";

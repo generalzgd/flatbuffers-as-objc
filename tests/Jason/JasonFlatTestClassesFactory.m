@@ -1,6 +1,9 @@
 // automatically generated, do not modify !!!
 
 #import "JasonFlatTestClassesFactory.h"
+#import "JasonFlatTestTestAppend.h"
+#import "JasonFlatTestTextureData.h"
+#import "JasonFlatTestTexture.h"
 
 
 @implementation JasonFlatTestClassesFactory
