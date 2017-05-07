@@ -135,9 +135,8 @@
 	[dic setValue:@([self texture_name]) forKey:@"texture_name"];
 	[dic setValue:@([self num_textures]) forKey:@"num_textures"];
 	vec = [self textures];
-	len = [vec count];
-	arr = [NSMutableArray arrayWithCapacity:len];
-	for(i=0; i<len; i++){
+	arr = [NSMutableArray array];
+	for(i=0; i<vec.count; i++){
 		[arr addObject:[[vec objectAtIndex:i] getJsonObj]];
 	}
 	[dic setValue:arr forKey:@"textures"];

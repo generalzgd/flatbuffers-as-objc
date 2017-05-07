@@ -933,9 +933,9 @@ class ObjcGenerator : public BaseGenerator {
 					} else if(field.value.type.base_type == BASE_TYPE_VECTOR) {
 						auto vector_type = field.value.type.VectorType();
 						content_code += "	vec = [self "+field.name+"];\n";
-						content_code += "	len = [vec count];\n";
-						content_code += "	arr = [NSMutableArray arrayWithCapacity:len];\n";
-						content_code += "	for(i=0; i<len; i++){\n";
+						//content_code += "	len = [vec count];\n";
+						content_code += "	arr = [NSMutableArray array];\n";
+						content_code += "	for(i=0; i<vec.count; i++){\n";
 						if(vector_type.base_type == BASE_TYPE_STRUCT){
 							content_code += "		[arr addObject:[[vec objectAtIndex:i] getJsonObj]];\n";
 						} else {

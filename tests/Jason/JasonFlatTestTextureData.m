@@ -102,9 +102,8 @@
 
 	[dic setValue:@([self image_size]) forKey:@"image_size"];
 	vec = [self image_data];
-	len = [vec count];
-	arr = [NSMutableArray arrayWithCapacity:len];
-	for(i=0; i<len; i++){
+	arr = [NSMutableArray array];
+	for(i=0; i<vec.count; i++){
 		[arr addObject:[vec objectAtIndex:i]];
 	}
 	[dic setValue:arr forKey:@"image_data"];
