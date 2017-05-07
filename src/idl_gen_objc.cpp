@@ -581,7 +581,13 @@ class ObjcGenerator : public BaseGenerator {
 			std::string &content_code = *content_code_ptr;
 			std::string &real_code = *code_ptr;
 			//
-			headercode += "#import <Foundation/Foundation.h>";
+			headercode += "#import <Foundation/Foundation.h>\n";
+			headercode += "#import \"FBMutableData.h\"\n";
+
+			for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
+				auto &ev = **it;
+				headercode += "#import \""+nameSpace(parser)+ev.name+".h\"\n";
+			}
 
 			headercode += "\n\n";
 			headercode += "/// usage\n";
@@ -590,22 +596,19 @@ class ObjcGenerator : public BaseGenerator {
 			headercode += "\n\n";
 
 			headercode += "@interface "+nameSpace(parser) + enum_def.name + "Factory : NSObject\n";
-			headercode += "+ (instancetype)getInstance:(uint32_t)protocolId buf:(NSMutableData *)buf;\n";
+			headercode += "+ (NSObject *)getInstance:(uint32_t)protocolId buf:(NSMutableData *)buf;\n";
 			headercode += "\n@end\n";
 			//
 			//
 			content_code += "#import \""+nameSpace(parser) + enum_def.name+"Factory.h\"\n";
 
-			for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
-				auto &ev = **it;
-				content_code += "#import \""+nameSpace(parser)+ev.name+".h\"\n";
-			}
+			
 
 			content_code += "\n\n";
 			content_code += "@implementation "+nameSpace(parser) + enum_def.name+"Factory";
 			content_code += "\n\n";
 
-			content_code += "+ (instancetype)getInstance:(uint32_t)protocolId buf:(NSMutableData *)buf {\n";
+			content_code += "+ (NSObject *)getInstance:(uint32_t)protocolId buf:(NSMutableData *)buf {\n";
 			content_code += "	switch (protocolId) {\n";
 
 			for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){

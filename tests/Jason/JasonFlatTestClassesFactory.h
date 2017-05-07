@@ -1,6 +1,11 @@
 // automatically generated, do not modify !!!
 
 #import <Foundation/Foundation.h>
+#import "FBMutableData.h"
+#import "JasonFlatTestTestAppend.h"
+#import "JasonFlatTestTextureData.h"
+#import "JasonFlatTestTexture.h"
+
 
 /// usage
 /// #import "Factory.h"
@@ -8,6 +13,6 @@
 
 
 @interface JasonFlatTestClassesFactory : NSObject
-+ (instancetype)getInstance:(uint32_t)protocolId buf:(NSMutableData *)buf;
++ (NSObject *)getInstance:(uint32_t)protocolId buf:(NSMutableData *)buf;
 
 @end

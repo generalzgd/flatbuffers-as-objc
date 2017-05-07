@@ -1,14 +1,11 @@
 // automatically generated, do not modify !!!
 
 #import "JasonFlatTestClassesFactory.h"
-#import "JasonFlatTestTestAppend.h"
-#import "JasonFlatTestTextureData.h"
-#import "JasonFlatTestTexture.h"
 
 
 @implementation JasonFlatTestClassesFactory
 
-+ (instancetype)getInstance:(uint32_t)protocolId buf:(NSMutableData *)buf {
++ (NSObject *)getInstance:(uint32_t)protocolId buf:(NSMutableData *)buf {
 	switch (protocolId) {
 		case 1:
 			return [JasonFlatTestTestAppend getRootAs:(FBMutableData *)buf];
