@@ -916,7 +916,7 @@ class ObjcGenerator : public BaseGenerator {
 			for(auto it = struct_def.fields.vec.begin(); it!=struct_def.fields.vec.end(); ++it){
 				auto &tmpfield = **it;
 				if(tmpfield.value.type.base_type == BASE_TYPE_VECTOR){
-					content_code += "	FBMutableArray *vec,int len, int i,NSMutableArray *arr;\n";
+					content_code += "	FBMutableArray *vec;int len; int i;NSMutableArray *arr;\n";
 					break;
 				}
 			}
@@ -927,24 +927,24 @@ class ObjcGenerator : public BaseGenerator {
 				auto &field = **it;
 				if(!field.deprecated){
 					if(IsScalar(field.value.type.base_type)){
-						content_code += "	[dic setValue:[self "+field.name+"] forKey:@\""+field.name+"\"]\n";
+						content_code += "	[dic setValue:[self "+field.name+"] forKey:@\""+field.name+"\"];\n";
 					} else if(field.value.type.base_type == BASE_TYPE_STRING) {
-						content_code += "	[dic setValue:[self "+field.name+"] forKey:@\""+field.name+"\"]\n";
+						content_code += "	[dic setValue:[self "+field.name+"] forKey:@\""+field.name+"\"];\n";
 					} else if(field.value.type.base_type == BASE_TYPE_VECTOR) {
 						auto vector_type = field.value.type.VectorType();
-						content_code += "	vec = [self "+field.name+"]\n";
-						content_code += "	len = [vec count]\n";
+						content_code += "	vec = [self "+field.name+"];\n";
+						content_code += "	len = [vec count];\n";
 						content_code += "	arr = [NSMutableArray arrayWithCapacity:len];\n";
 						content_code += "	for(i=0; i<len; i++){\n";
 						if(vector_type.base_type == BASE_TYPE_STRUCT){
-							content_code += "		[arr addObject:[[vec objectAtIndex:i] getJsonObj]]\n";
+							content_code += "		[arr addObject:[[vec objectAtIndex:i] getJsonObj]];\n";
 						} else {
-							content_code += "		[arr addObject:[vec objectAtIndex:i]]\n";
+							content_code += "		[arr addObject:[vec objectAtIndex:i]];\n";
 						}
 						content_code += "	}\n";
-						content_code += "	[dic setValue:arr forKey:@\""+field.name+"\"]\n";
+						content_code += "	[dic setValue:arr forKey:@\""+field.name+"\"];\n";
 					} else {
-						content_code += "	[dic setValue:[[self "+field.name+"] getJsonObj] forKey:@\""+field.name+"\"]\n";
+						content_code += "	[dic setValue:[[self "+field.name+"] getJsonObj] forKey:@\""+field.name+"\"];\n";
 					}
 				}
 			}
