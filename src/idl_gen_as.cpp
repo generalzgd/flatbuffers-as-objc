@@ -684,9 +684,7 @@ namespace as3{
 			for(auto it = struct_def.fields.vec.begin(); it!=struct_def.fields.vec.end(); ++it){
 				auto &tmpfield = **it;
 				if(tmpfield.value.type.base_type == BASE_TYPE_VECTOR){
-					code += Indent + Indent + Indent + "var arr:Array;\n";
-					code += Indent + Indent + Indent + "var len:int;\n";
-					code += Indent + Indent + Indent + "var i:int;\n";
+					code += Indent + Indent + Indent + "var arr:Array,len:int,i:int,e:*;\n";
 					break;
 				}
 			}
@@ -723,7 +721,7 @@ namespace as3{
 			code += Indent + Indent + Indent + "len = get"+MakeCamel(field.name)+"Length();\n";
 			code += Indent + Indent + Indent + "for(i=0; i<len; ++i)\n";
 			code += Indent + Indent + Indent + "{\n";
-			code += Indent + Indent + Indent + Indent + "var e:* = get"+MakeCamel(field.name)+"(i);\n";
+			code += Indent + Indent + Indent + Indent + "e = get"+MakeCamel(field.name)+"(i);\n";
 			if(vector_type.base_type == BASE_TYPE_STRUCT){
 				code += Indent + Indent + Indent + Indent + "arr.push( e.toJson() );\n";
 			}else{
@@ -1015,6 +1013,8 @@ bool GenerateAS3(const Parser &parser, const std::string &path, const std::strin
 	as3::As3Generator generator(parser, path, file_name);
 	return generator.generate();
 }
+
+
 
 
 }

@@ -657,6 +657,11 @@ extern bool GenerateAS3(const Parser &parser,
                         const std::string &path,
                         const std::string &file_name);
 
+// Éú³ÉObjC ´úÂë
+// see idl_gen_objc
+extern bool GenerateObjc(const Parser &parser,
+	const std::string &path,
+	const std::string &file_name);
 
 // Generate Python files from the definitions in the Parser object.
 // See idl_gen_python.cpp.

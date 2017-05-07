@@ -1,5 +1,4 @@
 #!/bin/bash -eu
-#
 # Copyright (c) 2013 Google, Inc.
 #
 # This software is provided 'as-is', without any express or implied

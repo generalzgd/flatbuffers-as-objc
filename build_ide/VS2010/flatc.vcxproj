@@ -265,6 +265,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\idl_gen_as.cpp" />
+    <ClCompile Include="..\..\src\idl_gen_objc.cpp" />
     <ClCompile Include="..\..\src\util.cpp" />
     <ClInclude Include="..\..\include\flatbuffers\flatbuffers.h" />
     <ClInclude Include="..\..\include\flatbuffers\idl.h" />

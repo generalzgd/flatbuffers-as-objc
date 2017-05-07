@@ -92,6 +92,12 @@ const Generator generators[] = {
 	"Generate ActionScript code for tables/structs",
 	flatbuffers::GeneralMakeRule },
 
+  { flatbuffers::GenerateObjc, "-oc", "--Objc", "Objective-C", 
+    flatbuffers::IDLOptions::kMAX, 
+    "Generate Objective-C files for tables/structs", 
+    flatbuffers::GeneralMakeRule
+  }
+
   /*{ flatbuffers::GenerateGRPC, nullptr, "--grpc", "GRPC",
     flatbuffers::IDLOptions::kMAX,
     "Generate GRPC interfaces",
