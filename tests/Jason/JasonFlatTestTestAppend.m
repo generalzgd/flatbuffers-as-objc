@@ -64,7 +64,7 @@
 }
 
 /// get json obj from flatbuffer
-- (NSDictionary) getJsonObj {
+- (NSDictionary *) getJsonObj {
 	NSMutableDictionary *dic = [[NSMutableDictionary alloc]init];
 
 	[dic setValue:[self test_num] forKey:@"test_num"]

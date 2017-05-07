@@ -13,5 +13,5 @@
 @property (nonatomic, assign)int32_t test_num2;
 
 /// get json obj from flatbuffer
-@property (nonatomic, strong) NSDictionary getJsonObj;
+- (NSDictionary *) getJsonObj;
 @end

@@ -96,7 +96,7 @@
 }
 
 /// get json obj from flatbuffer
-- (NSDictionary) getJsonObj {
+- (NSDictionary *) getJsonObj {
 	NSMutableDictionary *dic = [[NSMutableDictionary alloc]init];
 	FBMutableArray *vec,int len, int i,NSMutableArray *arr;
 

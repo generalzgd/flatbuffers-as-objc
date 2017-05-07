@@ -907,10 +907,10 @@ class ObjcGenerator : public BaseGenerator {
 			std::string &head_code = *head_code_ptr;
 
 			head_code += "/// get json obj from flatbuffer\n";
-			head_code += "@property (nonatomic, strong) NSDictionary getJsonObj;\n";
+			head_code += "- (NSDictionary *) getJsonObj;\n";
 			//
 			content_code += "/// get json obj from flatbuffer\n";
-			content_code += "- (NSDictionary) getJsonObj {\n";
+			content_code += "- (NSDictionary *) getJsonObj {\n";
 			content_code += "	NSMutableDictionary *dic = [[NSMutableDictionary alloc]init];\n";
 
 			for(auto it = struct_def.fields.vec.begin(); it!=struct_def.fields.vec.end(); ++it){
