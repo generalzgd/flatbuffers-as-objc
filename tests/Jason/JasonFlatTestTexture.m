@@ -132,7 +132,7 @@
 	NSMutableDictionary *dic = [[NSMutableDictionary alloc]init];
 	FBMutableArray *vec; int i; NSMutableArray *arr;
 
-	[dic setValue:@([self texture_name]) forKey:@"texture_name"];
+	[dic setValue:[self texture_name] forKey:@"texture_name"];
 	[dic setValue:@([self num_textures]) forKey:@"num_textures"];
 	vec = [self textures];
 	arr = [NSMutableArray array];

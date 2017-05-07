@@ -929,7 +929,7 @@ class ObjcGenerator : public BaseGenerator {
 					if(IsScalar(field.value.type.base_type)){
 						content_code += "	[dic setValue:@([self "+field.name+"]) forKey:@\""+field.name+"\"];\n";
 					} else if(field.value.type.base_type == BASE_TYPE_STRING) {
-						content_code += "	[dic setValue:@([self "+field.name+"]) forKey:@\""+field.name+"\"];\n";
+						content_code += "	[dic setValue:[self "+field.name+"] forKey:@\""+field.name+"\"];\n";
 					} else if(field.value.type.base_type == BASE_TYPE_VECTOR) {
 						auto vector_type = field.value.type.VectorType();
 						content_code += "	vec = [self "+field.name+"];\n";
