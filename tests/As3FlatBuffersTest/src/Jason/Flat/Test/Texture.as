@@ -13,7 +13,9 @@ package Jason.Flat.Test
 	import flash.utils.ByteArray;
 
 
-	///文理结构
+	/**
+	 * 文理结构
+	 */
 	public class Texture extends Table
 	{
 		/**
@@ -40,6 +42,9 @@ package Jason.Flat.Test
 			return this;
 		}
 
+		/**
+		 * @return String
+		 */
 		public function getTextureName():String
 		{
 			var o:int = this.__offset(4);
@@ -56,9 +61,9 @@ package Jason.Flat.Test
 		}
 
 		/**
-		 * @return *
+		 * @return TextureData
 		 */
-		public function getTextures(j:int):*
+		public function getTextures(j:int):TextureData
 		{
 			var o:int = this.__offset(8);
 			var obj:TextureData = new TextureData();
@@ -72,6 +77,20 @@ package Jason.Flat.Test
 		{
 			var o:int = this.__offset(8);
 			return o!=0?this.__vector_len(o):0;
+		}
+
+		/**
+		 * @return Array
+		 */
+		public function getTexturesVector():Array
+		{
+			var arr:Array = new Array();
+			var len:int = this.getTexturesLength();
+			for(var i:int=0; i<len; ++i)
+			{
+				arr.push( this.getTextures(i) );
+			}
+			return arr;
 		}
 
 		/**
@@ -92,12 +111,41 @@ package Jason.Flat.Test
 			return o!=0?this.bb.getShort(o+this.bb_pos):0;
 		}
 
+		/**
+		 * @return TestAppend
+		 */
 		public function getTestAppend():TestAppend
 		{
 			var obj:TestAppend = new TestAppend();
 			var o:int = this.__offset(16);
 			o!=0?obj.init(this.__indirect(o + this.bb_pos), this.bb) : 0;
-			return obj
+			return obj;
+		}
+
+		/**
+		 * change to json object
+		 */
+		public function toJson():Object
+		{
+			var o:Object = {};
+			var arr:Array;
+			var len:int;
+			var i:int;
+			o.texture_name = getTextureName();
+			o.num_textures = getNumTextures();
+			arr = [];
+			len = getTexturesLength();
+			for(i=0; i<len; ++i)
+			{
+				var e:* = getTextures(i);
+				arr.push( e.toJson() );
+			}
+			o.textures = arr;
+			o.num_test = getNumTest();
+			o.num_test1 = 0;
+			o.num_test2 = getNumTest2();
+			o.test_append = getTestAppend().toJson();
+			return o;
 		}
 
 		/**

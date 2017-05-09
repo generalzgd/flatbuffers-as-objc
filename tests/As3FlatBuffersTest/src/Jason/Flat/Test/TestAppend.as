@@ -13,7 +13,9 @@ package Jason.Flat.Test
 	import flash.utils.ByteArray;
 
 
-	///testAppend注释
+	/**
+	 * testAppend注释
+	 */
 	public class TestAppend extends Table
 	{
 		/**
@@ -56,6 +58,17 @@ package Jason.Flat.Test
 		{
 			var o:int = this.__offset(6);
 			return o!=0?this.bb.getInt(o+this.bb_pos):0;
+		}
+
+		/**
+		 * change to json object
+		 */
+		public function toJson():Object
+		{
+			var o:Object = {};
+			o.test_num = getTestNum();
+			o.test_num2 = getTestNum2();
+			return o;
 		}
 
 		/**

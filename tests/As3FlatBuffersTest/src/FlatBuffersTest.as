@@ -12,18 +12,32 @@ package
 	import flash.utils.Dictionary;
 	import flash.utils.Endian;
 	
-	import zgd.google.flatbuffers.ByteBuffer;
 	import zgd.google.flatbuffers.FlatBufferBuilder;
+	import zgd.hurlant.util.Base64;
+	
 	
 	public class FlatBuffersTest extends Sprite
 	{
 		public function FlatBuffersTest()
 		{
-			writeTest();
+			//writeTest();
 			
-			readTest();
+			//readTest();
+			
+			testObjCContent();
 		}
 		
+		private function testObjCContent():void
+		{
+			var base64:String = "EgAAAAAADAASAAQACAAMABAADAAAAB4AAAAKAAAAWAAAAFoAAgAAAIMM";
+			var bytes:ByteArray = Base64.decodeToByteArray(base64);
+			
+			//var inst:TestAppend = TestAppend.getRootAsTestAppend(bytes);
+			//var inst:Texture = Texture.getRootAsTexture(bytes);
+			var inst:TextureData = TextureData.getRootAsTextureData(bytes);
+			trace(JSON.stringify(inst.toJson()));
+			
+		}		
 		
 		private function writeTest():void
 		{

@@ -871,6 +871,7 @@
 }
 
 - (void) fb_addStruct:(FBTable *)table voffset:(int)voffset offset:(int)offset {
+    if(table==nil)return;
     
     [self fb_set_offset:voffset value:offset];
 
@@ -880,7 +881,7 @@
 }
 
 - (void) fb_addTable:(FBTable *)table voffset:(int)voffset offset:(int)offset {
-    
+    if(table==nil)return;
     [self fb_set_offset:voffset value:offset];
 
 //    [self fb_add_data_table:[table getData] offset:[self fb_offset:voffset]+bb_pos];

@@ -13,7 +13,9 @@ package Jason.Flat.Test
 	import flash.utils.ByteArray;
 
 
-	///文理数据结构
+	/**
+	 * 文理数据结构
+	 */
 	public class TextureData extends Table
 	{
 		/**
@@ -53,10 +55,10 @@ package Jason.Flat.Test
 		 * @param int offset
 		 * @return int
 		 */
-		public function getImageData(j:int):*
+		public function getImageData(j:int):int
 		{
 			var o:int = this.__offset(6);
-			return o!=0?this.bb.getByte(this.__vector(o) + j * 1):0;
+			return o!=0?this.bb.getUbyte(this.__vector(o) + j * 1):0;
 		}
 
 		/**
@@ -77,6 +79,20 @@ package Jason.Flat.Test
 		}
 
 		/**
+		 * @return Array
+		 */
+		public function getImageDataVector():Array
+		{
+			var arr:Array = new Array();
+			var len:int = this.getImageDataLength();
+			for(var i:int=0; i<len; ++i)
+			{
+				arr.push( this.getImageData(i) );
+			}
+			return arr;
+		}
+
+		/**
 		 * @return int
 		 */
 		public function getTestNum2():int
@@ -92,6 +108,29 @@ package Jason.Flat.Test
 		{
 			var o:int = this.__offset(10);
 			return o!=0?this.bb.getShort(o+this.bb_pos):0;
+		}
+
+		/**
+		 * change to json object
+		 */
+		public function toJson():Object
+		{
+			var o:Object = {};
+			var arr:Array;
+			var len:int;
+			var i:int;
+			o.image_size = getImageSize();
+			arr = [];
+			len = getImageDataLength();
+			for(i=0; i<len; ++i)
+			{
+				var e:* = getImageData(i);
+				arr.push( e );
+			}
+			o.image_data = arr;
+			o.test_num2 = getTestNum2();
+			o.image_test = getImageTest();
+			return o;
 		}
 
 		/**
@@ -152,7 +191,7 @@ package Jason.Flat.Test
 		{
 			builder.startVector(1, data.length, 1);
 			for(var i:int=data.length-1; i>=0; i--){
-				builder.addByte(data[i]);
+				builder.addUbyte(data[i]);
 			}
 			return builder.endVector();
 		}
