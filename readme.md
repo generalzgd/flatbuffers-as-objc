@@ -22,6 +22,7 @@ unpacking/parsing it first, while still having great forwards/backwards compatib
 * PHP
 * Python
 * ActionScript3 (added)
+* ObjectiveC (added: refer from jidibingren/flatbuffers)
 
 *and many more in progress...*
 
