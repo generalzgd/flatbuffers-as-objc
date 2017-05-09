@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "FBMutableData.h"
+#import "FBMutableArray.h"
 #import "FBConstants.h"
 
 @interface FBTable : NSObject{

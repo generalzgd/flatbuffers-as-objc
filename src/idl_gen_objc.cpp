@@ -564,7 +564,7 @@ class ObjcGenerator : public BaseGenerator {
                     ++it) {
                 auto &ev = **it;
                 GenComment(ev.doc_comment, code_ptr, &lang.comment_config, "  ");
-                code += " " + nameSpace(parser) + ev.name + " = ";
+                code += " " + nameSpace(parser) + ev.name + "_ = ";
                 code += NumToString(ev.value);
                 code += lang.enum_separator;
             }
