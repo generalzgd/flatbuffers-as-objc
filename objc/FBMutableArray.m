@@ -28,18 +28,22 @@
 // *** Super's Required Methods (because you're going to use them) ***
 
 -(void)addObject:(id)anObject {
+    if(anObject == nil)return;
     [_backendArray addObject:anObject];
 }
 
 -(void)insertObject:(id)anObject atIndex:(NSUInteger)index {
+    if(anObject == nil || _backendArray.count >= index)return;
     [_backendArray insertObject:anObject atIndex:index];
 }
 
 -(void)replaceObjectAtIndex:(NSUInteger)index withObject:(id)anObject {
+    if(anObject == nil || _backendArray.count >= index)return;
     [_backendArray replaceObjectAtIndex:index withObject:anObject];
 }
 
 -(instancetype)objectAtIndex:(NSUInteger)index {
+    if(_backendArray.count >= index)return nil;
     return [_backendArray objectAtIndex:index];
 }
 
@@ -48,6 +52,7 @@
 }
 
 -(void)removeObject:(id)anObject {
+    if(anObject == nil)return;
     [_backendArray removeObject:anObject];
 }
 
@@ -60,6 +65,7 @@
 }
 
 -(void)removeObjectAtIndex:(NSUInteger)index {
+    if(_backendArray.count >= index)return;
     [_backendArray removeObjectAtIndex:index];
 }
 
