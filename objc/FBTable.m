@@ -966,7 +966,7 @@
             [data setInt32:length offset:0];
             for (int i = 0 ; i < length ; i++) {
                 item = (FBTable*)temp[i];
-                [data appendData:[item getData]];
+                if(item!=nil)[data appendData:[item getData]];
             }
             
             [self fb_add_data:[data data] offset:[self fb_offset:voffset]+bb_pos];
@@ -986,8 +986,10 @@
             [data setInt32:length offset:0];
             for (int i = 0 ; i < length ; i++) {
                 item = (NSString*)temp[i];
-                [data setInt32:(int32_t)(data.length-(4*i+4)) offset:i*4+4];
-                [data appenddingString:item];
+                if(item!=nil){
+                    [data setInt32:(int32_t)(data.length-(4*i+4)) offset:i*4+4];
+                    [data appenddingString:item];    
+                }
             }
             [self fb_add_data:[data data] offset:[self fb_offset:voffset]+bb_pos];
         }
@@ -1007,8 +1009,10 @@
             for (int i = 0 ; i < length ; i++) {
                 item = (FBTable*)temp[i];
 //                [data setInt32:(int32_t)(data.length-(4*i+4)) offset:i*4+4];
-                [data setInt32:(int32_t)(data.length-(4*i+4)+item->bb_pos) offset:i*4+4];
-                [data appendData:[item getData]];
+                if(item!=nil){
+                    [data setInt32:(int32_t)(data.length-(4*i+4)+item->bb_pos) offset:i*4+4];
+                    [data appendData:[item getData]];    
+                }
             }
             [self fb_add_data:[data data] offset:[self fb_offset:voffset]+bb_pos];
         }
