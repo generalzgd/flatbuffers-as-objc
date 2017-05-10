@@ -220,7 +220,7 @@ namespace as3{
 			code += Indent + Indent + " * @return " + struct_def.name + "\n";
 			code += Indent + Indent + " */\n";
 
-			code += Indent + Indent + "public static function getRootAs" + struct_def.name + "(inData:ByteArray):"+struct_def.name+"\n";
+			code += Indent + Indent + "public static function getRootAs(inData:ByteArray):"+struct_def.name+"\n";
 			code += Indent + Indent + "{\n";
 			code += Indent + Indent + Indent + "var bb:ByteBuffer = ByteBuffer.wrap(inData);\n";
 			code += Indent + Indent + Indent + "var obj:"+struct_def.name+" = new " + struct_def.name + "();\n";
@@ -775,7 +775,7 @@ namespace as3{
 			for(auto it=enum_def.vals.vec.begin(); it != enum_def.vals.vec.end(); ++it){
 				auto &ev = **it;
 			code += Indent + Indent + Indent + Indent + "case " + NumToString(ev.value) +":";
-			code += "return " + FullNamespace(".", *enum_def.defined_namespace)+"."+MakeCamel(ev.name)+".getRootAs"+MakeCamel(ev.name)+"(bytes);\n";
+			code += "return " + FullNamespace(".", *enum_def.defined_namespace)+"."+MakeCamel(ev.name)+".getRootAs(bytes);\n";
 			}
 		
 			code += Indent + Indent + Indent + "}\n";
