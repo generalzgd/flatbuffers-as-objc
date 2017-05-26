@@ -500,7 +500,7 @@ namespace as3{
 			code += Indent + Indent + " * @return void\n";
 			code += Indent + Indent + " */\n";
 
-			code += Indent + Indent + "public static function start" + struct_def.name+"(builder:FlatBufferBuilder):void\n";
+			code += Indent + Indent + "public static function start(builder:FlatBufferBuilder):void\n";
 			code += Indent + Indent + "{\n";
 			code += Indent + Indent + Indent + "builder.startObject(" + NumToString(struct_def.fields.vec.size()) + ");\n";
 			code += Indent + Indent + "}\n\n";
@@ -510,7 +510,7 @@ namespace as3{
 			code += Indent + Indent + " * @param (if type is * means int offset value)\n";
 			code += Indent + Indent + " * @return " + struct_def.name + " offset\n";
 			code += Indent + Indent + " */\n";
-			code += Indent + Indent + "public static function create"+struct_def.name + "(builder:FlatBufferBuilder, ";
+			code += Indent + Indent + "public static function create(builder:FlatBufferBuilder, ";
 
 			for(auto it = struct_def.fields.vec.begin(); it!=struct_def.fields.vec.end(); ++it){
 				auto &field = **it;
@@ -604,7 +604,7 @@ namespace as3{
 			code += Indent + Indent + " * @return int table offset\n";
 			code += Indent + Indent + " */\n";
 
-			code += Indent + Indent + "public static function end"+struct_def.name+"(builder:FlatBufferBuilder):int\n";
+			code += Indent + Indent + "public static function end(builder:FlatBufferBuilder):int\n";
 			code += Indent + Indent + "{\n";
 			code += Indent + Indent + Indent + "var o:int = builder.endObject();\n";
 			for(auto it = struct_def.fields.vec.begin(); it != struct_def.fields.vec.end(); ++it){
@@ -992,7 +992,7 @@ namespace as3{
 			li.push_back("@return int offset");
 			GenAccessorComment(struct_def.doc_comment, li, code_ptr);
 
-			code += Indent + Indent + "public static function create" + struct_def.name + "(builder:FlatBufferBuilder";
+			code += Indent + Indent + "public static function create(builder:FlatBufferBuilder";
 			StructBuilderArgs(struct_def, "", code_ptr);
 			code += "):int\n";
 			code += Indent + Indent + "{\n";

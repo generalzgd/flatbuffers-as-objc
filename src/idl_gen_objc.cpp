@@ -132,6 +132,29 @@ class ObjcGenerator : public BaseGenerator {
             return SaveFile(filename.c_str(), code, false);
         }
 
+		static bool SaveAllHeaderPch(const LanguageParameters &lang, const Parser &parser,
+			const std::string &defname, const std::string &classcode,
+			const std::string &path, bool needs_includes, bool onefile) {
+				if (!classcode.length()) return true;
+
+				std::string namespace_dir = path;  // Either empty or ends in separator.
+				auto &namespaces = parser.namespaces_.back()->components;
+				for (auto it = namespaces.begin(); it != namespaces.end(); ++it) {
+					if (!onefile) {
+						namespace_dir += *it + kPathSeparator;
+						break;
+					}
+				}
+
+				EnsureDirExists(namespace_dir);
+
+				std::string code = "// automatically generated, do not modify !!!\n\n";
+				if (needs_includes) code += lang.includes;
+				code += classcode;
+				auto filename = namespace_dir + defname + ".pch";
+				return SaveFile(filename.c_str(), code, false);
+		}
+
 		static bool SaveFactoryHeader(const LanguageParameters &lang, const Parser &parser, 
 										const std::string &defname, const std::string &classcode, 
 										const std::string &path, bool needs_includes, bool onefile){
@@ -961,6 +984,28 @@ class ObjcGenerator : public BaseGenerator {
 			content_code += "	return dic;\n";
 			content_code += "}\n";
 		}
+
+		//include all heads
+		static void SavePch(const flatbuffers::Parser &parser, const LanguageParameters &lang, std::string *code_ptr){
+			std::string &code = *code_ptr;
+			code += "//\n";
+			code += "//AllHeads.h\n";
+			code += "//\n\n";
+			code += "//include all heads file which are auto generated\n\n";
+
+			code += "#ifndef ALL_HEADS_PCH\n";
+			code += "#define ALL_HEADS_PCH\n\n";
+
+			code += "#ifdef __ObjC__\n\n";
+			for(auto it = parser.enums_.vec.begin(); it != parser.enums_.vec.end(); ++it){
+				code += "#import \"" +nameSpace(parser) + (**it).name + lang.header_file_extension+ "\"\n";
+			}
+			for (auto it = parser.structs_.vec.begin(); it != parser.structs_.vec.end(); ++it) {
+				code += "#import \"" +nameSpace(parser) + (**it).name + lang.header_file_extension+ "\"\n";
+			}
+			code += "\n#endif\n";
+			code += "#endif\n";
+		}
             
         ObjcGenerator(const Parser &parser, const std::string &path,
                         const std::string &file_name)
@@ -1008,11 +1053,16 @@ class ObjcGenerator : public BaseGenerator {
                         return false;
                 }
             }
-                
+            
             if (parser_.opts.one_file) {
                 return SaveClass(lang, parser_, file_name_, one_file_code, path_, true,
                                     true);
             }
+
+			std::string pchCode;
+			SavePch(parser_, lang, &pchCode);
+			SaveHeader(lang, parser_, nameSpace(parser_) + "AllHeads", pchCode, path_, false,false);
+
             return true;
         }
             
