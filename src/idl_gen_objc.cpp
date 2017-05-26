@@ -993,18 +993,18 @@ class ObjcGenerator : public BaseGenerator {
 			code += "//\n\n";
 			code += "//include all heads file which are auto generated\n\n";
 
-			code += "#ifndef ALL_HEADS_PCH\n";
-			code += "#define ALL_HEADS_PCH\n\n";
+			code += "#ifndef ALL_HEADS_H\n";
+			code += "#define ALL_HEADS_H\n\n";
 
-			code += "#ifdef __ObjC__\n\n";
+			//code += "#ifdef __ObjC__\n\n";
 			for(auto it = parser.enums_.vec.begin(); it != parser.enums_.vec.end(); ++it){
 				code += "#import \"" +nameSpace(parser) + (**it).name + lang.header_file_extension+ "\"\n";
 			}
 			for (auto it = parser.structs_.vec.begin(); it != parser.structs_.vec.end(); ++it) {
 				code += "#import \"" +nameSpace(parser) + (**it).name + lang.header_file_extension+ "\"\n";
 			}
+			//code += "\n#endif\n";
 			code += "\n#endif\n";
-			code += "#endif\n";
 		}
             
         ObjcGenerator(const Parser &parser, const std::string &path,
