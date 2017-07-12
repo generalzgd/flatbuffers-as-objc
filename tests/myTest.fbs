@@ -6,7 +6,9 @@ union Any { TextureData, Texture}
 
 ///testAppend注释
 table TestAppend {
+	///test_num注释
 	test_num:int;
+	///test_num2注释
 	test_num2:int;
 }
 

@@ -655,7 +655,7 @@ class ObjcGenerator : public BaseGenerator {
                                 StructDef &struct_def, std::string *code_ptr, std::string *content_code_ptr) {
             if (struct_def.generated) return;
             std::string tempcode;
-            std::string headercode;
+            std::string headercode;//Í·ÎÄ¼þ
             std::string &code = tempcode;
             std::string &content_code = *content_code_ptr;
             std::string &real_code = *code_ptr;
@@ -684,7 +684,7 @@ class ObjcGenerator : public BaseGenerator {
                     ++it) {
                 auto &field = **it;
                 if (field.deprecated) continue;
-                GenComment(field.doc_comment, code_ptr, &lang.comment_config, "  ");
+                GenComment(field.doc_comment, &code, &lang.comment_config, "  ");
                 std::string type_name = GenTypeGet(parser, field.value.type);
 //                    std::string type_name_dest = GenTypeNameDest(lang, parser, field.value.type);
                 std::string type_name_dest = GenTypeGet(parser, field.value.type);

@@ -6,10 +6,8 @@
 
 //include all heads file which are auto generated
 
-#ifndef ALL_HEADS_PCH
-#define ALL_HEADS_PCH
-
-#ifdef __ObjC__
+#ifndef ALL_HEADS_H
+#define ALL_HEADS_H
 
 #import "JasonFlatTestColor.h"
 #import "JasonFlatTestAny.h"
@@ -18,5 +16,4 @@
 #import "JasonFlatTestTextureData.h"
 #import "JasonFlatTestTexture.h"
 
-#endif
 #endif

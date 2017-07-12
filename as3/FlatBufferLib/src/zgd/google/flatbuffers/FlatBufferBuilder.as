@@ -575,6 +575,7 @@ package zgd.google.flatbuffers
 		 */		
 		public function createString(s:String):int
 		{
+			//if(!s)return 0;
 			notNested();
 			
 			//need to check utf8 string???  Flash's String is already utf8 code
@@ -595,6 +596,7 @@ package zgd.google.flatbuffers
 		
 		public function createByteVector(byte:ByteArray):int
 		{
+			if(!byte)return 0;
 			notNested()
 			
 			var len:uint = byte.length;
