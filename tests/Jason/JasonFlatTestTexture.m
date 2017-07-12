@@ -97,8 +97,9 @@
 
 - (void) add_test_append {
 
-    [self fb_addTable:_test_append voffset:16 offset:18];
-
+	if(_test_append){
+		[self fb_addTable:_test_append voffset:16 offset:18];
+	}
     return ;
 
 }

@@ -1,8 +1,8 @@
 // automatically generated, do not modify !!!
 
 typedef NS_ENUM(NSInteger,JasonFlatTestClasses)  {
- JasonFlatTestTestAppend_ = 1,
- JasonFlatTestTextureData_ = 2,
- JasonFlatTestTexture_ = 3,
+ JasonFlatTestClassesTestAppend_ = 1,
+ JasonFlatTestClassesTextureData_ = 2,
+ JasonFlatTestClassesTexture_ = 3,
 };
 

@@ -587,7 +587,7 @@ class ObjcGenerator : public BaseGenerator {
                     ++it) {
                 auto &ev = **it;
                 GenComment(ev.doc_comment, code_ptr, &lang.comment_config, "  ");
-                code += " " + nameSpace(parser) + ev.name + "_ = ";
+				code += " " + nameSpace(parser) + enum_def.name + ev.name + "_ = ";
                 code += NumToString(ev.value);
                 code += lang.enum_separator;
             }
@@ -734,9 +734,13 @@ class ObjcGenerator : public BaseGenerator {
                             
                         content_code += "- (void) add_"+field.name+" {\n\n";
                         if (struct_def.fixed || field.value.type.struct_def->fixed) {
-                            content_code += "    [self fb_addStruct:_"+field.name+" voffset:"+NumToString(field.value.offset)+" offset:"+NumToString(bytesize+4)+"];\n\n";
+							content_code += "	if(_"+field.name+"){\n";
+                            content_code += "		[self fb_addStruct:_"+field.name+" voffset:"+NumToString(field.value.offset)+" offset:"+NumToString(bytesize+4)+"];\n";
+							content_code += "	}\n";
                         }else{
-                            content_code += "    [self fb_addTable:_"+field.name+" voffset:"+NumToString(field.value.offset)+" offset:"+NumToString(bytesize+4)+"];\n\n";
+							content_code += "	if(_"+field.name+"){\n";
+                            content_code += "		[self fb_addTable:_"+field.name+" voffset:"+NumToString(field.value.offset)+" offset:"+NumToString(bytesize+4)+"];\n";
+							content_code += "	}\n";
                         }
                         content_code += "    return ;\n\n";
                         content_code += "}\n\n";
