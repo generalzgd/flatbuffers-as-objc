@@ -787,7 +787,7 @@ namespace php {
 					code += Indent + Indent + "$o['" + field.name + "'] = $this->get" + MakeCamel(field.name) + "().toJson();\n";
 				}
 			}else{
-				code += Indent + Indent + "$o['" + field.name + "'] = " + (field.value.type.base_type==BASE_TYPE_BOOL?"false":field.value.constant)+";\n";
+				//code += Indent + Indent + "$o['" + field.name + "'] = " + (field.value.type.base_type==BASE_TYPE_BOOL?"false":field.value.constant)+";\n";
 			}
 		}
 

@@ -703,7 +703,7 @@ namespace as3{
 						code += Indent + Indent + Indent + "o." + field.name + " = get" + MakeCamel(field.name) + "().toJson();\n";
 					}
 				}else{
-					code += Indent + Indent + Indent + "o." + field.name + " = " + (field.value.type.base_type==BASE_TYPE_BOOL?"false":field.value.constant)+";\n";
+					//code += Indent + Indent + Indent + "o." + field.name + " = " + (field.value.type.base_type==BASE_TYPE_BOOL?"false":field.value.constant)+";\n";
 				}
 			}
 
