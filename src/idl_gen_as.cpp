@@ -932,7 +932,7 @@ namespace as3{
 			case BASE_TYPE_BOOL:
 				return value.constant == "0"?"false":"true";
 			case BASE_TYPE_STRING:
-				return "null";
+				return "\"\"";
 			case BASE_TYPE_LONG:
 			case BASE_TYPE_ULONG:
 				if(value.constant != "0"){
